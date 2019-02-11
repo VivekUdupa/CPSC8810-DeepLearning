@@ -16,7 +16,7 @@ torch.manual_seed(seed)
 image_size = 256
 
 #Dataset Directory
-img_folder = "../../TrainingData"
+img_folder = "../../data"
 
 #Miltiple folders exist inside 'TrainingData' Directory. I think pytorch takes these folder names as different classes for classification. 
 
@@ -30,7 +30,7 @@ transform = transforms.Compose([
     ])
 
 #train_set = torchvision.datasets.ImageFolder(root=img_folder, transform=transform)
-train_set = torchvision.datasets.ImageFolder(root=img_folder, transform=transform)
+train_set = torchvision.datasets.ImageFolder(root=img_folder)
 
 #Load the data into an object
 data_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
@@ -45,8 +45,10 @@ print("Images Loaded")
 img_name = 'lp1022.jpg'
 #print(train_set[0])
 #plt.imshow(io.imread(os.path.join('../../TrainingData/pullinghair/lp1022.jpg'), img_name))
-img = train_set.__getitem__(1)
-plt.imshow(img)
+img = train_set.__getitem__(416)
+print(img)
+plt.imshow(img[0])
 plt.show()
+print(img[0].info)
 
 #plt.imshow(torchvision.transforms.ToPILImage()(train_set[0]))
