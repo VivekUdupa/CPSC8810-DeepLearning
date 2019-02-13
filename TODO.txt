@@ -1,0 +1,21 @@
+1) Change image size to 300
+2) CNN layer 1 specs -> in_channel = 1, out_channel=16, stride = 1, padding = 1, kernel = 3
+3) CNN layer 2 specs -> in_channel = 16, out_channel=32, stride = 1, padding = 1, kernel = 3
+4) max pooling 1 and 2 -> kernel_size = 2
+
+layer 1
+-------
+300x300 image -> 302x302 after padding=1 -> 300x300 after conv1 -> 150x150 after max pooling 1(stride = 2).
+in channel = 1(Grayscale), out channel = 16(16 feature maps)
+
+layer 2
+-------
+150x150 image -> 152x152 after padding=1 -> 150x150 after conv2 -> 75x75 after max pool 2(Stride = 2).
+in channel = 16, out channel = 32
+
+layer 3 (Fully Connected layer)
+-------------------------------
+final output = 9 categories
+input = 32 channels x 75x75 image pixels ( output of layer 2)
+
+
