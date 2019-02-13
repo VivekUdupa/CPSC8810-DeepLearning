@@ -49,14 +49,14 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
 
         # Convolution Layer 1
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=5, stride=1, padding=2)
+        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
         self.relu1 = nn.ReLU()
 
         # Max Pooling 1
         self.maxpool1 = nn.MaxPool2d(kernel_size=2)
 
         # Convolution Layer 2
-        self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5, stride=1, padding=2)
+        self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.relu2 = nn.ReLU()
 
         # Max Pooling 2
@@ -66,8 +66,11 @@ class CNNModel(nn.Module):
         self.dropout = nn.Dropout(p=0.4)
 
         # Fully connected linear layer
-        self.fc1 = nn.Linear(32*7*7, 9)
-
+        self.fc1 = nn.Linear(32*7*7, 9)  #32 channels, 7x7 final image size
+	
+	#Image size = 28x28 -> 13x13 after first pooling
+	#14x14 after padding = 1
+	#7x7 after second pooling
 
     def forward(self, x):
         """ Forward Propogation for classification """
