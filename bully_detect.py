@@ -9,7 +9,7 @@ from torch.autograd import Variable
 
 # Hyperparameter initialization
 n_epoch         = 20
-n_class         = 10
+n_class         = 9
 batch_size      = 1
 learning_rate   = 1e-6
 
@@ -17,7 +17,7 @@ learning_rate   = 1e-6
 # Sorting out the data
 
 # Image parameters
-img_size = 28
+img_size = 300
 img_dir = "../TrainingData"
 
 
@@ -63,10 +63,10 @@ class CNNModel(nn.Module):
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
 
         # Dropout Regularization
-        self.dropout = nn.Dropout(p=0.4)
+        #self.dropout = nn.Dropout(p=0.4)
 
         # Fully connected linear layer
-        self.fc1 = nn.Linear(32*7*7, 9)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(32*75*75, 9)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
