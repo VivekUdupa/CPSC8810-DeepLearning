@@ -23,3 +23,11 @@ Feb 16th
 1) Accuracy 100% at some epoch, rest 0%. Figure out why?
 2) Select a proper dataset
 3) Images gossiping0277 and gossiping0251 were not in .jpg. it was in webp format, should we fix it? 
+4) what is batch_size? how is it helpful?
+
+Note:
+-----
+Test data fixed(almost): Make different folders for different categories of test images. The algorithm will try to predict based on the training images. prediction = 0 -> category 0(gossiping) and so on
+
+5) Encode labels to categories and display the results better
+
