@@ -8,17 +8,26 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 # Hyperparameter initialization
-n_epoch         = 2
+n_epoch         = 6
 n_class         = 9
-batch_size      = 10
-learning_rate   = 1e-6
+batch_size      = 1
+learning_rate   = 0.001
 
+# check if GPU is available
+print(torch.cuda.current_device())
+print(torch.cuda.device(0))
+print(torch.cuda.device_count())
+print(torch.cuda.get_device_name(0))
+
+#To run on GPU
+device = torch.device("cuda:0")
 
 # Sorting out the data
 
 # Image parameters
 img_size = 300
-img_dir = "../TrainingData"
+train_img = "../TrainingData"
+test_img = "../TestData"
 
 
 # Define the transformation
@@ -30,10 +39,10 @@ transform = transforms.Compose( [#transforms.Resize(img_size),
                                  ])
 
 # Training dataset
-train_dataset = datasets.ImageFolder(root=img_dir, transform=transform)
+train_dataset = datasets.ImageFolder(root=train_img, transform=transform)
 
 # Testing dataset
-test_dataset = datasets.ImageFolder(root=img_dir, transform=transform)
+test_dataset = datasets.ImageFolder(root=test_img, transform=transform)
 
 # Placing data into dataloader for better accessibility
 # Shuffle training dataset to eleminate bias
@@ -126,6 +135,8 @@ optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 n_iteration = 0
 
 for epoch in range(n_epoch):
+    total = 0
+    correct = 0
     for i, (images, labels) in enumerate(train_loader):
         # Wrap into Variable
         images = Variable(images)
@@ -149,17 +160,17 @@ for epoch in range(n_epoch):
         n_iteration += 1
 
         # Total number of labels
-        total = labels.size(0)
+        total += labels.size(0)
 
         # obtain prediction from max value
         _, predicted = torch.max(outputs.data, 1)
 
         # Calculate the number of right answers
-        correct = (predicted == labels).sum().item()
+        correct += (predicted == labels).sum().item()
 
         # Prit loss and accuracy
         if (i + 1) % 100 == 0:
-            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100))
+            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
 
 
 # Testing the model
@@ -173,6 +184,7 @@ with torch.no_grad():
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
+        print("predicted: {} | Correct: {} %".format(predicted, labels))
 
-print('Test Accuracy of the model on the 10000 test images: {} %'.format(100 * correct / total))
+print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
 
