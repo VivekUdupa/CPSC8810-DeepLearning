@@ -18,4 +18,8 @@ layer 3 (Fully Connected layer)
 final output = 9 categories
 input = 32 channels x 75x75 image pixels ( output of layer 2)
 
-
+Feb 16th
+--------
+1) Accuracy 100% at some epoch, rest 0%. Figure out why?
+2) Select a proper dataset
+3) Images gossiping0277 and gossiping0251 were not in .jpg. it was in webp format, should we fix it? 
