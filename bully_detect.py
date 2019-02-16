@@ -21,7 +21,7 @@ print(torch.cuda.get_device_name(0))
 
 #To run on GPU
 device = torch.device("cuda:0")
-
+dtype = torch.float
 # Sorting out the data
 
 # Image parameters
@@ -122,7 +122,7 @@ class CNNModel(nn.Module):
         return out
     
 # Instance creation
-model = CNNModel()
+model = CNNModel().cuda()
 
 # Create instance of loss
 criterion = nn.CrossEntropyLoss()
@@ -139,8 +139,8 @@ for epoch in range(n_epoch):
     correct = 0
     for i, (images, labels) in enumerate(train_loader):
         # Wrap into Variable
-        images = Variable(images)
-        labels = Variable(labels)
+        images = Variable(images).cuda()
+        labels = Variable(labels).cuda()
 
         # Clear the gradients
         optimizer.zero_grad()
@@ -178,8 +178,8 @@ with torch.no_grad():
     correct = 0
     total = 0
     for images, labels in test_loader:
-        images = Variable(images)
-        labels = Variable(labels)
+        images = Variable(images).cuda()
+        labels = Variable(labels).cuda()
         outputs = model(images)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
