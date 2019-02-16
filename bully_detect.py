@@ -10,7 +10,7 @@ from torch.autograd import Variable
 # Hyperparameter initialization
 n_epoch         = 2
 n_class         = 9
-batch_size      = 1
+batch_size      = 10
 learning_rate   = 1e-6
 
 
