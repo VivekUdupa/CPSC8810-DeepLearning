@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 
 # Hyperparameter initialization
-n_epoch         = 20
+n_epoch         = 2
 n_class         = 9
 batch_size      = 1
 learning_rate   = 1e-6
@@ -22,7 +22,8 @@ img_dir = "../TrainingData"
 
 
 # Define the transformation
-transform = transforms.Compose( [transforms.Resize(img_size),
+transform = transforms.Compose( [#transforms.Resize(img_size),
+                                 transforms.CenterCrop(img_size),
                                  transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
@@ -63,10 +64,11 @@ class CNNModel(nn.Module):
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
 
         # Dropout Regularization
-        #self.dropout = nn.Dropout(p=0.4)
+        self.dropout = nn.Dropout(p=0.4)
 
         # Fully connected linear layer
-        self.fc1 = nn.Linear(32*75*75, 9)  #32 channels, 7x7 final image size
+        #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
+        self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
@@ -78,25 +80,34 @@ class CNNModel(nn.Module):
         # Convolution 1
         out = self.cnn1(x)
         out = self.relu1(out)
+        
+#        print("size of out1:", out.shape)
 
         # Max pool 1
         out = self.maxpool1(out)
+#        print("size of out1 maxpool:", out.shape)
 
         # Convolution 2
         out = self.cnn2(out)
         out = self.relu2(out)
+#        print("size of out2:", out.shape)
 
         # Max pool 2
         out = self.maxpool2(out)
-
+#        print("size of out2 maxpool:", out.shape)
+        
         # Resize the tensor, -1 decides the best dimension automatically
+        #out = out.view(out.size(0), -1)
         out = out.view(out.size(0), -1)
+#        print("size of out resize:", out.shape)
 
         # Dropout
         out = self.dropout(out)
+#        print("size of out dropout:", out.shape)
 
         # Fully connected 1
         out = self.fc1(out)
+#        print("size of out fc1:", out.shape)
         
         # Return
         return out
@@ -148,7 +159,7 @@ for epoch in range(n_epoch):
 
         # Prit loss and accuracy
         if (i + 1) % 100 == 0:
-            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch + 1, num_epochs, i + 1, len(train_loader), loss.item(), (correct / total) * 100))
+            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100))
 
 
 # Testing the model
