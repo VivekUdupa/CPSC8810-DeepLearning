@@ -32,7 +32,6 @@ test_img = "../TestData"
 
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
-                                 #transforms.CenterCrop(img_size),
                                  transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
@@ -54,7 +53,7 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch
 class CNNModel(nn.Module):
     """ A CNN Model for image classification """
     
-    def __init__(self):
+    def __init__(self,image_size):
         """ CNN layer to process the image"""
         super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
 
@@ -77,7 +76,7 @@ class CNNModel(nn.Module):
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(32*image_size*image_size, 9)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
@@ -122,7 +121,7 @@ class CNNModel(nn.Module):
         return out
     
 # Instance creation
-model = CNNModel().cuda()
+model = CNNModel(img_size[0]/4).cuda()
 
 # Create instance of loss
 criterion = nn.CrossEntropyLoss()
