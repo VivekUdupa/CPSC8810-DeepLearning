@@ -121,7 +121,7 @@ class CNNModel(nn.Module):
         return out
     
 # Instance creation
-model = CNNModel(img_size[0]/4).cuda()
+model = CNNModel(int(img_size[0]/4)).cuda()
 
 # Create instance of loss
 criterion = nn.CrossEntropyLoss()
