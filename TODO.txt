@@ -32,3 +32,13 @@ Test data fixed(almost): Make different folders for different categories of test
 5) Encode labels to categories and display the results better
 
 6) Make the code run on GPU
+
+Feb 28
+--------
+
+1) Make outputs as pure string
+
+2) Modify code to take test image as command line arguement
+
+3) How to save and export model
+ 
