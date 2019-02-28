@@ -25,14 +25,14 @@ dtype = torch.float
 # Sorting out the data
 
 # Image parameters
-img_size = 300
+img_size = (256,256)
 train_img = "../TrainingData"
 test_img = "../TestData"
 
 
 # Define the transformation
-transform = transforms.Compose( [#transforms.Resize(img_size),
-                                 transforms.CenterCrop(img_size),
+transform = transforms.Compose( [transforms.Resize(img_size),
+                                 #transforms.CenterCrop(img_size),
                                  transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
