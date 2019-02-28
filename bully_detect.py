@@ -184,6 +184,7 @@ with torch.no_grad():
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
         print("predicted: {} | Correct: {} %".format(predicted, labels))
+        print("type of label is: ", type(predicted))
 
 print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
 
