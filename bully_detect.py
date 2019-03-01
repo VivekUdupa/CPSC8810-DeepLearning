@@ -7,13 +7,14 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import sys # For command Line arguments
-from PIL import Image
+import os
+from shutil import copyfile
 
 # Hyperparameter initialization
 n_epoch         = 5
 n_class         = 9
 batch_size      = 1
-learning_rate   = 0.0001
+learning_rate   = 0.1
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -30,12 +31,26 @@ dtype = torch.float
 img_size = (256,256)
 conv_size = int( img_size[0]/4 )
 train_img = "../TrainingData"
-#test_img = "../TestData"
-test_img_path = sys.argv[1]
+test_img  = "./TestData/"
 
-test_img = Image.open(test_img_path)
+test_img_filename = sys.argv[1]
+
+if not os.path.exists(test_img):
+    os.makedirs(test_img)
+    
+# clear the contents of the directory
+for the_file in os.listdir(test_img):
+    file_path = os.path.join(test_img, the_file)
+    try:
+        if os.path.isfile(file_path):
+            os.unlink(file_path)
+        #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+    except Exception as e:
+        print(e)
 
 
+copyfile(test_img_filename, test_img+test_img_filename)
+    
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
                                  transforms.Grayscale(num_output_channels=1),
@@ -47,10 +62,7 @@ transform = transforms.Compose( [transforms.Resize(img_size),
 train_dataset = datasets.ImageFolder(root=train_img, transform=transform)
 
 # Testing dataset
-test_dataset = transform(test_img).float()
-test_dataset = torch.tensor(test_dataset, requires_grad=True)
-test_dataset = test_dataset.unsqueeze(0)
-#test_dataset = datasets.ImageFolder(root=test_img, transform=transform)
+test_dataset = datasets.ImageFolder(root=test_img, transform=transform)
 
 # Placing data into dataloader for better accessibility
 # Shuffle training dataset to eleminate bias
@@ -190,17 +202,15 @@ def ten_to_str(x):
 with torch.no_grad():
     correct = 0
     total = 0
-    #for images in test_loader:
-    #for images in test_img:
-    images = Variable(images).cuda()
-    #labels = Variable(labels).cuda()
-    outputs = model(images)
-    _, predicted = torch.max(outputs.data, 1)
-    #total += labels.size(0)
-    #correct += (predicted == labels).sum().item()
-    #if (predicted!=labels):
-    #print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
-    print("predicted: {} ".format(ten_to_str(predicted)))
+    for images, labels in test_loader:
+        images = Variable(images).cuda()
+        labels = Variable(labels).cuda()
+        outputs = model(images)
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+        #if (predicted!=labels):
+       	print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
 
-#print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
+print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
 
