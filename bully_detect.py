@@ -14,7 +14,7 @@ from shutil import copyfile
 n_epoch         = 5
 n_class         = 9
 batch_size      = 1
-learning_rate   = 0.1
+learning_rate   = 0.0001
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -31,7 +31,8 @@ dtype = torch.float
 img_size = (256,256)
 conv_size = int( img_size[0]/4 )
 train_img = "../TrainingData"
-test_img  = "./TestData/"
+test_img  = "./TestData/test/"
+test_img1  = "./TestData"
 
 test_img_filename = sys.argv[1]
 
@@ -62,7 +63,7 @@ transform = transforms.Compose( [transforms.Resize(img_size),
 train_dataset = datasets.ImageFolder(root=train_img, transform=transform)
 
 # Testing dataset
-test_dataset = datasets.ImageFolder(root=test_img, transform=transform)
+test_dataset = datasets.ImageFolder(root=test_img1, transform=transform)
 
 # Placing data into dataloader for better accessibility
 # Shuffle training dataset to eleminate bias
@@ -97,7 +98,11 @@ class CNNModel(nn.Module):
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(32*image_size*image_size, op_size)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(32*image_size*image_size, 100)  #32 channels, 7x7 final image size
+        
+        self.relu3 = nn.ReLU()
+        
+        self.fc2 = nn.Linear(100, 9)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
@@ -136,6 +141,10 @@ class CNNModel(nn.Module):
 
         # Fully connected 1
         out = self.fc1(out)
+
+        out = self.relu3(out)
+
+        out = self.fc2(out)
 #        print("size of out fc1:", out.shape)
         
         # Return
