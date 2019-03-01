@@ -7,12 +7,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 import sys # For command Line arguments
+from PIL import Image
 
 # Hyperparameter initialization
 n_epoch         = 5
 n_class         = 9
 batch_size      = 1
-learning_rate   = 0.1
+learning_rate   = 0.0001
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -30,7 +31,10 @@ img_size = (256,256)
 conv_size = int( img_size[0]/4 )
 train_img = "../TrainingData"
 #test_img = "../TestData"
-test_img = sys.argv[1]
+test_img_path = sys.argv[1]
+
+test_img = Image.open(test_img_path)
+
 
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
@@ -43,7 +47,10 @@ transform = transforms.Compose( [transforms.Resize(img_size),
 train_dataset = datasets.ImageFolder(root=train_img, transform=transform)
 
 # Testing dataset
-test_dataset = datasets.ImageFolder(root=test_img, transform=transform)
+test_dataset = transform(test_img).float()
+test_dataset = torch.tensor(test_dataset, requires_grad=True)
+test_dataset = test_dataset.unsqueeze(0)
+#test_dataset = datasets.ImageFolder(root=test_img, transform=transform)
 
 # Placing data into dataloader for better accessibility
 # Shuffle training dataset to eleminate bias
@@ -183,15 +190,17 @@ def ten_to_str(x):
 with torch.no_grad():
     correct = 0
     total = 0
-    for images, labels in test_loader:
-        images = Variable(images).cuda()
-        labels = Variable(labels).cuda()
-        outputs = model(images)
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-        #if (predicted!=labels):
-       	print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
+    #for images in test_loader:
+    #for images in test_img:
+    images = Variable(images).cuda()
+    #labels = Variable(labels).cuda()
+    outputs = model(images)
+    _, predicted = torch.max(outputs.data, 1)
+    #total += labels.size(0)
+    #correct += (predicted == labels).sum().item()
+    #if (predicted!=labels):
+    #print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
+    print("predicted: {} ".format(ten_to_str(predicted)))
 
-print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
+#print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
 
