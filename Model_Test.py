@@ -14,7 +14,7 @@ from Detection_Model import CNNModel
 # loading the input test image
 test_img_filename = sys.argv[1]
 
-img_size = (256,256)
+img_size = (300, 300)
 conv_size = int( img_size[0]/4 )
 test_img  = "./TestData/test/"
 test_img1  = "./TestData"
@@ -52,8 +52,6 @@ test_dataset = datasets.ImageFolder(root=test_img1, transform=transform)
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
 # Image parameters
-img_size = (256,256)
-conv_size = int( img_size[0]/4 )
 n_class         = 9
 
 model = CNNModel(conv_size, n_class).cuda()

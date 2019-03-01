@@ -12,7 +12,7 @@ from shutil import copyfile
 from Detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 1
+n_epoch         = 10
 n_class         = 9
 batch_size      = 1
 learning_rate   = 0.0001
@@ -29,7 +29,7 @@ dtype = torch.float
 # Sorting out the data
 
 # Image parameters
-img_size = (256,256)
+img_size = (300,300)
 conv_size = int( img_size[0]/4 )
 train_img = "../TrainingData"
 Model = "./Model"
