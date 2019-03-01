@@ -6,12 +6,13 @@ import torchvision.datasets as datasets
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
+import sys # For command Line arguments
 
 # Hyperparameter initialization
-n_epoch         = 6
+n_epoch         = 5
 n_class         = 9
 batch_size      = 1
-learning_rate   = 0.001
+learning_rate   = 0.1
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -26,9 +27,10 @@ dtype = torch.float
 
 # Image parameters
 img_size = (256,256)
+conv_size = int( img_size[0]/4 )
 train_img = "../TrainingData"
-test_img = "../TestData"
-
+#test_img = "../TestData"
+test_img = sys.argv[1]
 
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
@@ -53,7 +55,7 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch
 class CNNModel(nn.Module):
     """ A CNN Model for image classification """
     
-    def __init__(self,image_size):
+    def __init__(self,image_size, op_size):
         """ CNN layer to process the image"""
         super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
 
@@ -76,7 +78,7 @@ class CNNModel(nn.Module):
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(32*image_size*image_size, 9)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(32*image_size*image_size, op_size)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
@@ -121,7 +123,7 @@ class CNNModel(nn.Module):
         return out
     
 # Instance creation
-model = CNNModel(int(img_size[0]/4)).cuda()
+model = CNNModel(conv_size, n_class).cuda()
 
 # Create instance of loss
 criterion = nn.CrossEntropyLoss()
@@ -171,6 +173,11 @@ for epoch in range(n_epoch):
         if (i + 1) % 100 == 0:
             print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
 
+def ten_to_str(x):
+	""" Function to convert tensor label to a string """
+	value = x.data[0] #Convert to data
+	str_label = ["gossiping", "isolation", "laughing", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
+	return str_label[value]
 
 # Testing the model
 with torch.no_grad():
@@ -183,8 +190,8 @@ with torch.no_grad():
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
-        print("predicted: {} | Correct: {} %".format(predicted, labels))
-        print("type of label is: ", type(predicted))
+        #if (predicted!=labels):
+       	print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
 
 print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
 
