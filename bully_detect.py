@@ -9,6 +9,7 @@ from torch.autograd import Variable
 import sys # For command Line arguments
 import os
 from shutil import copyfile
+from Detection_Model import CNNModel
 
 # Hyperparameter initialization
 n_epoch         = 1
@@ -31,28 +32,8 @@ dtype = torch.float
 img_size = (256,256)
 conv_size = int( img_size[0]/4 )
 train_img = "../TrainingData"
-test_img  = "./TestData/test/"
-test_img1  = "./TestData"
 Model = "./Model"
 
-test_img_filename = sys.argv[1]
-
-if not os.path.exists(test_img):
-    os.makedirs(test_img)
-    
-# clear the contents of the directory
-for the_file in os.listdir(test_img):
-    file_path = os.path.join(test_img, the_file)
-    try:
-        if os.path.isfile(file_path):
-            os.unlink(file_path)
-        #elif os.path.isdir(file_path): shutil.rmtree(file_path)
-    except Exception as e:
-        print(e)
-
-
-copyfile(test_img_filename, test_img+test_img_filename)
-    
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
                                  transforms.Grayscale(num_output_channels=1),
@@ -63,94 +44,10 @@ transform = transforms.Compose( [transforms.Resize(img_size),
 # Training dataset
 train_dataset = datasets.ImageFolder(root=train_img, transform=transform)
 
-# Testing dataset
-test_dataset = datasets.ImageFolder(root=test_img1, transform=transform)
-
 # Placing data into dataloader for better accessibility
 # Shuffle training dataset to eleminate bias
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
-
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
-
-#Defining the CNN
-class CNNModel(nn.Module):
-    """ A CNN Model for image classification """
-    
-    def __init__(self,image_size, op_size):
-        """ CNN layer to process the image"""
-        super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
-
-        # Convolution Layer 1
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
-        self.relu1 = nn.ReLU()
-
-        # Max Pooling 1
-        self.maxpool1 = nn.MaxPool2d(kernel_size=2)
-
-        # Convolution Layer 2
-        self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
-        self.relu2 = nn.ReLU()
-
-        # Max Pooling 2
-        self.maxpool2 = nn.MaxPool2d(kernel_size=2)
-
-        # Dropout Regularization
-        self.dropout = nn.Dropout(p=0.4)
-
-        # Fully connected linear layer
-        #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(32*image_size*image_size, 100)  #32 channels, 7x7 final image size
-        
-        self.relu3 = nn.ReLU()
-        
-        self.fc2 = nn.Linear(100, 9)  #32 channels, 7x7 final image size
-	
-	#Image size = 28x28 -> 13x13 after first pooling
-	#14x14 after padding = 1
-	#7x7 after second pooling
-
-    def forward(self, x):
-        """ Forward Propogation for classification """
-        
-        # Convolution 1
-        out = self.cnn1(x)
-        out = self.relu1(out)
-        
-#        print("size of out1:", out.shape)
-
-        # Max pool 1
-        out = self.maxpool1(out)
-#        print("size of out1 maxpool:", out.shape)
-
-        # Convolution 2
-        out = self.cnn2(out)
-        out = self.relu2(out)
-#        print("size of out2:", out.shape)
-
-        # Max pool 2
-        out = self.maxpool2(out)
-#        print("size of out2 maxpool:", out.shape)
-        
-        # Resize the tensor, -1 decides the best dimension automatically
-        #out = out.view(out.size(0), -1)
-        out = out.view(out.size(0), -1)
-#        print("size of out resize:", out.shape)
-
-        # Dropout
-        out = self.dropout(out)
-#        print("size of out dropout:", out.shape)
-
-        # Fully connected 1
-        out = self.fc1(out)
-
-        out = self.relu3(out)
-
-        out = self.fc2(out)
-#        print("size of out fc1:", out.shape)
-        
-        # Return
-        return out
-    
+  
 # Instance creation
 model = CNNModel(conv_size, n_class).cuda()
 
@@ -202,30 +99,8 @@ for epoch in range(n_epoch):
         if (i + 1) % 100 == 0:
             print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
 
-def ten_to_str(x):
-	""" Function to convert tensor label to a string """
-	value = x.data[0] #Convert to data
-	str_label = ["gossiping", "isolation", "laughing", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
-	return str_label[value]
-"""
-# Testing the model
-with torch.no_grad():
-    correct = 0
-    total = 0
-    for images, labels in test_loader:
-        images = Variable(images).cuda()
-        labels = Variable(labels).cuda()
-        outputs = model(images)
-        _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
-        #if (predicted!=labels):
-       	print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
-
-print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
-"""
-
+# Saving the trained model            
 if not os.path.exists(Model):
     os.makedirs(Model)
 torch.save(model.state_dict(), "./Model/mark1.pth")
-print("Saved?")
+print("Model saved at ./Model/mark1.pth")
