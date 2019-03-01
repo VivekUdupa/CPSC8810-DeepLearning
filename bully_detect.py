@@ -11,7 +11,7 @@ import os
 from shutil import copyfile
 
 # Hyperparameter initialization
-n_epoch         = 5
+n_epoch         = 1
 n_class         = 9
 batch_size      = 1
 learning_rate   = 0.0001
@@ -33,6 +33,7 @@ conv_size = int( img_size[0]/4 )
 train_img = "../TrainingData"
 test_img  = "./TestData/test/"
 test_img1  = "./TestData"
+Model = "./Model"
 
 test_img_filename = sys.argv[1]
 
@@ -206,7 +207,7 @@ def ten_to_str(x):
 	value = x.data[0] #Convert to data
 	str_label = ["gossiping", "isolation", "laughing", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
 	return str_label[value]
-
+"""
 # Testing the model
 with torch.no_grad():
     correct = 0
@@ -222,4 +223,9 @@ with torch.no_grad():
        	print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
 
 print('Test Accuracy of the model on the {} test images: {} %'.format(len(test_loader), 100 * correct / total))
+"""
 
+if not os.path.exists(Model):
+    os.makedirs(Model)
+torch.save(model.state_dict(), "./Model/mark1.pth")
+print("Saved?")
