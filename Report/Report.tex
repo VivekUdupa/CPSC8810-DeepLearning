@@ -1,0 +1,167 @@
+\documentclass[12pt]{report}
+\usepackage[left=2cm, right=2cm, top=2cm]{geometry}
+\usepackage[utf8]{inputenc} 
+\usepackage{mdframed} %For framing the title
+\usepackage{graphicx} % to include images
+\usepackage{amsmath} % For math mode
+\usepackage{mathtools} %for bmatrix*
+\usepackage{caption} % For captions
+\usepackage{subcaption} % To use caption while using mini page
+\usepackage{amssymb} % To use math symbols
+\usepackage{multirow} %To combine multiple rows in a table
+\usepackage[table]{xcolor} %To color rows / columns in table
+\usepackage{titling} %To vertically center the title page
+\usepackage{hyperref} %for URL
+\usepackage{float} %For [H] in includegraphics
+\usepackage[section]{placeins} %PRevents floats before a section
+\usepackage{textcomp} %For degree symbol
+
+
+%----------------------------MATLAB TEMPLATE -------------------------------------
+\usepackage{listings}
+\usepackage{color} %red, green, blue, yellow, cyan, magenta, black, white
+\definecolor{mygreen}{RGB}{28,172,0} % color values Red, Green, Blue
+\definecolor{mylilas}{RGB}{170,55,241}
+%-----------------------------------------------------------------------------------------
+
+
+\begin{titlepage}
+\title{\bf CPSC 8810 - Deep Learning\\
+Deep Learning Models to Detect CyberBully Actions in Images}
+\author{Submitted By:\\	Vivek Koodli Udupa - (C12768888) \\
+		Shashi Shivaraju - (C88650674)\\}
+\date{Clemson University \\\today}
+\end{titlepage}
+
+
+%%To make the title page center vertically centered
+%\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+%\renewcommand\maketitlehookd{\vfill\null}
+
+\begin{document}
+%\begin{mdframed}
+%Displaying Title
+%\begin{titlepage}
+\maketitle
+\pagenumbering{gobble}% Remove page numbers (and reset to 1)
+%\end{titlepage}
+%\end{mdframed}\begin{document}
+
+
+\pagenumbering{roman} %set page numbering to roman
+
+%----------------------------------------------------------------------------------------
+%	REPORT ABSTRACT
+%----------------------------------------------------------------------------------------
+\newpage
+\begin{abstract}
+\thispagestyle{plain}
+\addcontentsline{toc}{section}{\bf Abstract}
+This report explains the process involved in modelling a Convolutional Neural Network to detect and classify various cyberbully actions in an image. 
+\end{abstract}
+\newpage
+
+\pagenumbering{arabic} %set page numbering to arabic
+%----------------------------------------------------------------------------------------
+%	Introduction
+%----------------------------------------------------------------------------------------
+% Introduction Chapter
+\section*{1 Introduction}
+This report considers the problem of detection and calssification of cyberbully actions caputired in an image using Deep learning models.  \\
+
+Cyberbullying is bullying that takes place over digital devices like cell phones, computers, and tablets. Cyberbullying can occur through SMS, Text, and apps, or online in social media, forums, or gaming where people can view, participate in, or share content. Cyberbullying includes sending, posting, or sharing negative, harmful, false, or mean content about someone else. Some cyberbullying crosses the line into unlawful or criminal behavior. With the prevalence of social media and digital forums, comments, photos, posts, and content shared by individuals can often be viewed by strangers as well as acquaintances. The content an individual shares online – both their personal content as well as any negative, mean, or hurtful content – creates a kind of permanent public record of their views, activities, and behavior. This public record can be thought of as an online reputation, which may be accessible to schools, employers, colleges, clubs, and others who may be researching an individual now or in the future. Cyberbullying can harm the online reputations of everyone involved – not just the person being bullied, but those doing the bullying or participating in it.[1] \\ 
+
+Deep learning is a subset of machine learning where artificial neural networks, algorithms inspired by the human brain, learn from large amounts of data. The term  ‘deep learning’ because the neural networks have various (deep) layers that enable learning. Deep learning allows machines to solve complex problems even when using a data set that is very diverse, unstructured and inter-connected. The more deep learning algorithms learn, the better they perform. [2] \\
+
+This report describes modelling of a deep learning network based on the concept of convolutional neural network for detecting and classifying cyberbully actions for a given image. The cyberbullying actions considered in this project are laughing, pulling-hair, quarrel, slapping, punching, stabbing, gossiping, strangle and isolation. The designed model is trained using the provided image dataset which contain above mentioned 9 categories of cyberbully actions in them.   
+
+\newpage
+
+\section*{2 Methods}
+In deep learning, a convolutional neural network (CNN, or ConvNet) is a class of deep neural networks, most commonly applied to analyzing visual imagery.[3] A convolutional neural network consists of an input and an output layer, as well as multiple hidden layers. The hidden layers of a CNN typically consist of convolutional layers, RELU layer i.e. activation function, pooling layers, fully connected layers and normalization layers.[4] \\ 
+
+Convolutional networks were inspired by biological processes in that the connectivity pattern between neurons resembles the organization of the animal visual cortex. CNNs use relatively little pre-processing compared to other image classification algorithms. This means that the network learns the filters that in traditional algorithms were hand-engineered. This independence from prior knowledge and human effort in feature design is a major advantage. \\
+
+The implementation of our model based on CNN using an open source machine learning library PyTorch is described in the section below. 
+
+\section*{2.1 Implementation of CNN Model}
+Our model is implemented using the following layers: 
+\begin{enumerate}
+	\item {\textbf{Convolutional Layer:}} The convolutional layer is the core building block of a CNN. The layer's parameters consist of a set of learnable filters (or kernels). During the forward pass, each filter is convolved across the width and height of the input volume, computing the dot product between the entries of the filter and the input and producing a 2-dimensional activation map of that filter. As a result, the network learns filters that activate when it detects some specific type of feature at some spatial position in the input.
+	
+	\item {\textbf{ReLU layer:}} ReLU is the abbreviation of rectified linear unit, which applies the non-saturating activation function 
+\begin{equation}	
+	f(x)=max(0, x)
+\end{equation} It effectively removes negative values from an activation map by setting them to zero. It increases the nonlinear properties of the decision function and of the overall network without affecting the receptive fields of the convolution layer. 
+
+	\item {\textbf{Max Pooling:}} Another important concept of CNNs is pooling, which is a form of non-linear down-sampling. Max pooling is the most common non-linear function for down-sampling. It partitions the input image into a set of non-overlapping rectangles and, for each such sub-region, outputs the maximum. 
+	
+	\item \textbf{Fully Connected Layer:} Finally, after several convolutional and max pooling layers, the high-level reasoning in the neural network is done via fully connected layers. Neurons in a fully connected layer have connections to all activations in the previous layer, as seen in regular (non-convolutional) artificial neural networks. Their activations can thus be computed as an affine transformation, with matrix multiplication followed by a bias offset. 
+	
+	\item \textbf{Dropout Layer:} A single model can be used to simulate having a large number of different network architectures by randomly dropping out nodes during training. This is called dropout and offers a very computationally cheap and remarkably effective regularization method to reduce overfitting and generalization error in deep neural networks.[5]
+
+\end{enumerate}
+
+The implementation details of our model is as follows: 
+\begin{enumerate}
+	\item \textbf{Image Pre-Processing: } The given input image is converted into mono-channeled, greyscale image of size 256 x 256. Then it is converted to a PyTorch tensor image and itsd values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
+  
+	\item \textbf{Convolution Layer 1:} The input to this layer is a preprocessed tensor image from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 16 channel feature map. 
+	
+	\item \textbf{ReLU Layer 1:} This layer applies a relu activation function to the 16 channel feature map.
+	 
+	 \item \textbf{Max Pooling Layer 1:} This layer down-samples the 256x256 16 channel feature map to 128x128 16 channel feature map.
+	 
+	 \item \textbf{Convolution Layer 2:} The input to this layer is the 16 channel 128x128 feature map from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
+	 
+	 \item \textbf{ReLU Layer 2:} This layer applies a relu activation function to the 32 channel feature map.
+	 
+	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128x128 32 channel feature map to 64x64 32 channel feature map.
+	 
+	 \item \textbf{Flattening Layer: } This layer flattens the 2D feature map to 1D feature map. 
+	 
+	 \item \textbf{Dropout Layer:} This layer randomly zeros some of the element of the input tensor with probability 0.4. 
+	 
+	 \item \textbf{Fully Connected Layer 1:} This layer maps the feature map into 100 neurons.
+	 
+	 \item \textbf{ReLU Layer 3:} This layer applies a relu activation function to the output of Fully Connected Layer 1.
+	 
+	 \item \textbf{Fully Connected Layer 2:} This layer maps 100 neurons into 10 categories of classification.
+	 
+\end{enumerate}
+
+Please refer the appendix for the python implementation of the above described model. 
+
+\section*{2.2 Training of the CNN Model}
+The implemented model is trained using the following parameters:
+\begin{enumerate}
+	\item Learning Rate = 0.001
+	\item Batch Size = 1
+	\item Epoch = 50
+\end{enumerate}
+
+
+
+\newpage
+
+\section*{3 Results}
+The implemented model was trained using a learning rate of 0.001 
+
+
+
+\newpage
+\section*{4 References}
+[1] \url{https://www.stopbullying.gov/cyberbullying/what-is-it/index.html} \\ \newline
+[2] \url{https://www.forbes.com/sites/bernardmarr/2018/10/01/what-is-deep-learning-ai-a-simple-guide-with-8-practical-examples/#434cffaa8d4b} \\ \newline
+[3] \url{https://en.wikipedia.org/wiki/Convolutional_neural_network#Convolutional} \\ \newline
+[4] \url{https://cs231n.github.io/convolutional-networks/} \\ \newline
+[5] \url{https://machinelearningmastery.com/dropout-for-regularizing-deep-neural-networks/}
+
+\newpage
+
+\section*{5 Appendix}
+
+
+
+
+\end{document} 
