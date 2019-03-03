@@ -15,7 +15,7 @@
 \usepackage{float} %For [H] in includegraphics
 \usepackage[section]{placeins} %PRevents floats before a section
 \usepackage{textcomp} %For degree symbol
-
+\usepackage{enumerate} %For roman numbers
 
 %----------------------------MATLAB TEMPLATE -------------------------------------
 \usepackage{listings}
@@ -130,25 +130,47 @@ The implementation details of our model is as follows:
 	 
 \end{enumerate}
 
-Please refer the appendix for the python implementation of the above described model. 
-
-\section*{2.2 Training of the CNN Model}
-The implemented model is trained using the following parameters:
+\section*{2.2 Training the CNN Model}
+To train a deep learning model, the follwoing parameters are considered:
 \begin{enumerate}
-	\item Learning Rate = 0.001
+	\item \textbf{Epoch:} An epoch describes the number of times the algorithm sees the entire data set. So, each time the algorithm has seen all samples in the dataset, an epoch has completed.
+	\item \textbf{Batch Size:} The total number of training examples present in a single batch, wherein a batch is a subset of the entire data set. 
+	\item \textbf{Iteration:} The number of batches needed to complete one Epoch.
+	\item \textbf{Learning Rate:} The learning rate or step size in machine learning is hyperparameter which determines to what extent newly acquired information overrides old information.	
+\end{enumerate}
+
+The implemented model is trained using the below mentioned configuration:
+\begin{enumerate}
+	\item Epoch = 50	
 	\item Batch Size = 1
-	\item Epoch = 50
+	\item Learning Rate = 0.001
+\end{enumerate}
+
+The model is trained with the given training dataset as per the below mentioned algorithm:
+\begin{enumerate}
+	\item Initialize the CNN model with default parameters. 
+	\item Create an instance of adam optimizer for setting the learning rate
+	\item Create an instance of cross entropy loss
+	\item Initialize the optimizer with zero gradients \label{grad_clear}
+	\item Feed a training input image from the curret batch to the model to perform forward propogation
+	\item After the completion of forward propoigation, calculate the cross entropy loss
+	\item Perform backpropogation to minimize the loss
+	\item Update gradients
+	\item Iterate through step \ref{grad_clear} for all the batches in the training dataset
+	\item Repeat the above steps for the given number of epochs
+	\item Save the trained model for testing purpose
+	
 \end{enumerate}
 
 
-
+Please refer the appendix for the python implementation of the above described model. 
 \newpage
 
 \section*{3 Results}
 The implemented model was trained using a learning rate of 0.001 
 
 
-
+ 
 \newpage
 \section*{4 References}
 [1] \url{https://www.stopbullying.gov/cyberbullying/what-is-it/index.html} \\ \newline
