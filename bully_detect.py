@@ -15,7 +15,7 @@ from Detection_Model import CNNModel
 n_epoch         = 10
 n_class         = 9
 batch_size      = 1
-learning_rate   = 0.0001
+learning_rate   = 0.001
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -29,8 +29,9 @@ dtype = torch.float
 # Sorting out the data
 
 # Image parameters
-img_size = (300,300)
-conv_size = int( img_size[0]/4 )
+n_cnn = 3 #Number of CNN layer
+img_size = (512,512)
+conv_size = int( img_size[0]/ (2**n_cnn) ) # image_size / 8 for 3 cnn layer. i.e 2**3 = 8
 train_img = "../TrainingData"
 Model = "./Model"
 

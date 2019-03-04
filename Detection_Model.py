@@ -30,16 +30,23 @@ class CNNModel(nn.Module):
         # Max Pooling 2
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
 
+        # Convolution Layer 3
+        self.cnn3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
+        self.relu3 = nn.ReLU()
+        
+        # Max Pooling 3
+        self.maxpool3 = nn.MaxPool2d(kernel_size=2)
+        
         # Dropout Regularization
-        self.dropout = nn.Dropout(p=0.4)
+        self.dropout = nn.Dropout(p=0.8)
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(32*image_size*image_size, 100)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(64*image_size*image_size, 500)  #32 channels, 7x7 final image size
         
-        self.relu3 = nn.ReLU()
+        self.relu4 = nn.ReLU()
         
-        self.fc2 = nn.Linear(100, 9)  #32 channels, 7x7 final image size
+        self.fc2 = nn.Linear(500, 9)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
@@ -52,37 +59,36 @@ class CNNModel(nn.Module):
         out = self.cnn1(x)
         out = self.relu1(out)
         
-#        print("size of out1:", out.shape)
-
         # Max pool 1
         out = self.maxpool1(out)
-#        print("size of out1 maxpool:", out.shape)
 
         # Convolution 2
         out = self.cnn2(out)
         out = self.relu2(out)
-#        print("size of out2:", out.shape)
 
         # Max pool 2
         out = self.maxpool2(out)
-#        print("size of out2 maxpool:", out.shape)
+        
+        # Convolution 3
+        out = self.cnn3(out)
+        out = self.relu3(out)
+
+        # Max pool 2
+        out = self.maxpool3(out)
         
         # Resize the tensor, -1 decides the best dimension automatically
         #out = out.view(out.size(0), -1)
         out = out.view(out.size(0), -1)
-#        print("size of out resize:", out.shape)
 
         # Dropout
         out = self.dropout(out)
-#        print("size of out dropout:", out.shape)
 
         # Fully connected 1
         out = self.fc1(out)
 
-        out = self.relu3(out)
+        out = self.relu4(out)
 
         out = self.fc2(out)
-#        print("size of out fc1:", out.shape)
         
         # Return
         return out
