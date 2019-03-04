@@ -114,7 +114,7 @@ Our model is implemented using the following layers:
 
 The implementation details of our model is as follows: 
 \begin{enumerate}
-	\item \textbf{Image Pre-Processing: } The given input image is converted into mono-channeled, grayscale image of size 256 x 256. Then it is converted to a PyTorch tensor image and itsd values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
+	\item \textbf{Image Pre-Processing: } The given input image is converted into mono-channeled, gray scale image of size 256 x 256. Then it is converted to a PyTorch tensor image and its values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
   
 	\item \textbf{Convolution Layer 1:} The input to this layer is a preprocessed tensor image from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 16 channel feature map. 
 	
@@ -141,12 +141,12 @@ The implementation details of our model is as follows:
 \end{enumerate}
 
 \subsection{Training the CNN Model}
-To train a deep learning model, the follwoing parameters are considered:
+To train a deep learning model, the following parameters are considered:
 \begin{enumerate}
 	\item \textbf{Epoch:} An epoch describes the number of times the algorithm sees the entire data set. So, each time the algorithm has seen all samples in the dataset, an epoch has completed.
 	\item \textbf{Batch Size:} The total number of training examples present in a single batch, wherein a batch is a subset of the entire data set. 
 	\item \textbf{Iteration:} The number of batches needed to complete one Epoch.
-	\item \textbf{Learning Rate:} The learning rate or step size in machine learning is hyperparameter which determines to what extent newly acquired information overrides old information.	
+	\item \textbf{Learning Rate:} The learning rate or step size in machine learning is hyper-parameter which determines to what extent newly acquired information overrides old information.	
 \end{enumerate}
 
 The implemented model is trained using the below mentioned configuration:
@@ -164,7 +164,7 @@ The model is trained with the given training dataset as per the below mentioned 
 	\item Initialize the optimizer with zero gradients \label{grad_clear}
 	\item Feed a training input image from the current batch to the model to perform forward propagation
 	\item After the completion of forward propagation, calculate the cross entropy loss
-	\item Perform backpropagation to minimize the loss
+	\item Perform back propagation to minimize the loss
 	\item Update gradients
 	\item Iterate through step \ref{grad_clear} for all the batches in the training dataset
 	\item Repeat the above steps for the given number of epochs
@@ -177,7 +177,7 @@ Please refer the appendix for the python implementation of the above described m
 \newpage
 
 \section{Results}
-The implemented model was trained using a learning rate of 0.001 
+
 
 
  
