@@ -38,7 +38,7 @@ class CNNModel(nn.Module):
         self.maxpool3 = nn.MaxPool2d(kernel_size=2)
         
         # Dropout Regularization
-        self.dropout = nn.Dropout(p=0.8)
+        self.dropout = nn.Dropout(p=0.5)
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
