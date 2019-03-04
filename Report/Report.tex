@@ -1,4 +1,4 @@
-\documentclass[12pt]{report}
+\documentclass[12pt]{article}
 \usepackage[left=2cm, right=2cm, top=2cm]{geometry}
 \usepackage[utf8]{inputenc} 
 \usepackage{mdframed} %For framing the title
@@ -16,6 +16,12 @@
 \usepackage[section]{placeins} %PRevents floats before a section
 \usepackage{textcomp} %For degree symbol
 \usepackage{enumerate} %For roman numbers
+\usepackage{enumitem} %for reference numbers
+\usepackage{titling} %For the centering of title page
+\usepackage{url} %for URL linebreak
+\usepackage{breakurl} % for URL line break
+\PassOptionsToPackage{hyphens}{url}\usepackage{hyperref} % for URL line break
+
 
 %----------------------------MATLAB TEMPLATE -------------------------------------
 \usepackage{listings}
@@ -24,14 +30,17 @@
 \definecolor{mylilas}{RGB}{170,55,241}
 %-----------------------------------------------------------------------------------------
 
+%Centering of title page
+\renewcommand\maketitlehooka{\null\mbox{}\vfill}
+\renewcommand\maketitlehookd{\vfill\null}
 
-\begin{titlepage}
+%\begin{titlepage}
 \title{\bf CPSC 8810 - Deep Learning\\
-Deep Learning Models to Detect CyberBully Actions in Images}
+Deep Learning Model to Detect CyberBully Actions in Images}
 \author{Submitted By:\\	Vivek Koodli Udupa - (C12768888) \\
 		Shashi Shivaraju - (C88650674)\\}
 \date{Clemson University \\\today}
-\end{titlepage}
+%\end{titlepage}
 
 
 %%To make the title page center vertically centered
@@ -39,12 +48,13 @@ Deep Learning Models to Detect CyberBully Actions in Images}
 %\renewcommand\maketitlehookd{\vfill\null}
 
 \begin{document}
+\sloppy %to remove line breaks
 %\begin{mdframed}
 %Displaying Title
-%\begin{titlepage}
+\begin{titlingpage}
 \maketitle
 \pagenumbering{gobble}% Remove page numbers (and reset to 1)
-%\end{titlepage}
+\end{titlingpage}
 %\end{mdframed}\begin{document}
 
 
@@ -57,7 +67,7 @@ Deep Learning Models to Detect CyberBully Actions in Images}
 \begin{abstract}
 \thispagestyle{plain}
 \addcontentsline{toc}{section}{\bf Abstract}
-This report explains the process involved in modelling a Convolutional Neural Network to detect and classify various cyberbully actions in an image. 
+This report explains the process involved in  a Convolutional Neural Network to detect and classify various cyberbully actions in an image. 
 \end{abstract}
 \newpage
 
@@ -66,25 +76,25 @@ This report explains the process involved in modelling a Convolutional Neural Ne
 %	Introduction
 %----------------------------------------------------------------------------------------
 % Introduction Chapter
-\section*{1 Introduction}
+\section{Introduction}
 This report considers the problem of detection and calssification of cyberbully actions caputired in an image using Deep learning models.  \\
 
 Cyberbullying is bullying that takes place over digital devices like cell phones, computers, and tablets. Cyberbullying can occur through SMS, Text, and apps, or online in social media, forums, or gaming where people can view, participate in, or share content. Cyberbullying includes sending, posting, or sharing negative, harmful, false, or mean content about someone else. Some cyberbullying crosses the line into unlawful or criminal behavior. With the prevalence of social media and digital forums, comments, photos, posts, and content shared by individuals can often be viewed by strangers as well as acquaintances. The content an individual shares online – both their personal content as well as any negative, mean, or hurtful content – creates a kind of permanent public record of their views, activities, and behavior. This public record can be thought of as an online reputation, which may be accessible to schools, employers, colleges, clubs, and others who may be researching an individual now or in the future. Cyberbullying can harm the online reputations of everyone involved – not just the person being bullied, but those doing the bullying or participating in it.[1] \\ 
 
 Deep learning is a subset of machine learning where artificial neural networks, algorithms inspired by the human brain, learn from large amounts of data. The term  ‘deep learning’ because the neural networks have various (deep) layers that enable learning. Deep learning allows machines to solve complex problems even when using a data set that is very diverse, unstructured and inter-connected. The more deep learning algorithms learn, the better they perform. [2] \\
 
-This report describes modelling of a deep learning network based on the concept of convolutional neural network for detecting and classifying cyberbully actions for a given image. The cyberbullying actions considered in this project are laughing, pulling-hair, quarrel, slapping, punching, stabbing, gossiping, strangle and isolation. The designed model is trained using the provided image dataset which contain above mentioned 9 categories of cyberbully actions in them.   
+This report describes modeling of a deep learning network based on the concept of convolutional neural network for detecting and classifying cyberbully actions for a given image. The cyberbullying actions considered in this project are laughing, pulling-hair, quarrel, slapping, punching, stabbing, gossiping, strangle and isolation. The designed model is trained using the provided image dataset which contain above mentioned 9 categories of cyberbully actions in them.   
 
 \newpage
 
-\section*{2 Methods}
-In deep learning, a convolutional neural network (CNN, or ConvNet) is a class of deep neural networks, most commonly applied to analyzing visual imagery.[3] A convolutional neural network consists of an input and an output layer, as well as multiple hidden layers. The hidden layers of a CNN typically consist of convolutional layers, RELU layer i.e. activation function, pooling layers, fully connected layers and normalization layers.[4] \\ 
+\section{Methods}
+In deep learning, a convolutional neural network (CNN, or ConvNet) is a class of deep neural networks, most commonly applied to analyzing visual imagery.[3] A convolutional neural network consists of an input and an output layer, as well as multiple hidden layers. The hidden layers of a CNN typically consist of convolutional layers, ReLU layer i.e. activation function, pooling layers, fully connected layers and normalization layers.[4] \\ 
 
 Convolutional networks were inspired by biological processes in that the connectivity pattern between neurons resembles the organization of the animal visual cortex. CNNs use relatively little pre-processing compared to other image classification algorithms. This means that the network learns the filters that in traditional algorithms were hand-engineered. This independence from prior knowledge and human effort in feature design is a major advantage. \\
 
 The implementation of our model based on CNN using an open source machine learning library PyTorch is described in the section below. 
 
-\section*{2.1 Implementation of CNN Model}
+\subsection{Implementation of CNN Model}
 Our model is implemented using the following layers: 
 \begin{enumerate}
 	\item {\textbf{Convolutional Layer:}} The convolutional layer is the core building block of a CNN. The layer's parameters consist of a set of learnable filters (or kernels). During the forward pass, each filter is convolved across the width and height of the input volume, computing the dot product between the entries of the filter and the input and producing a 2-dimensional activation map of that filter. As a result, the network learns filters that activate when it detects some specific type of feature at some spatial position in the input.
@@ -98,25 +108,25 @@ Our model is implemented using the following layers:
 	
 	\item \textbf{Fully Connected Layer:} Finally, after several convolutional and max pooling layers, the high-level reasoning in the neural network is done via fully connected layers. Neurons in a fully connected layer have connections to all activations in the previous layer, as seen in regular (non-convolutional) artificial neural networks. Their activations can thus be computed as an affine transformation, with matrix multiplication followed by a bias offset. 
 	
-	\item \textbf{Dropout Layer:} A single model can be used to simulate having a large number of different network architectures by randomly dropping out nodes during training. This is called dropout and offers a very computationally cheap and remarkably effective regularization method to reduce overfitting and generalization error in deep neural networks.[5]
+	\item \textbf{Dropout Layer:} A single model can be used to simulate having a large number of different network architectures by randomly dropping out nodes during training. This is called dropout and offers a very computationally cheap and remarkably effective regularization method to reduce over fitting and generalization error in deep neural networks.[5]
 
 \end{enumerate}
 
 The implementation details of our model is as follows: 
 \begin{enumerate}
-	\item \textbf{Image Pre-Processing: } The given input image is converted into mono-channeled, greyscale image of size 256 x 256. Then it is converted to a PyTorch tensor image and itsd values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
+	\item \textbf{Image Pre-Processing: } The given input image is converted into mono-channeled, grayscale image of size 256 x 256. Then it is converted to a PyTorch tensor image and itsd values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
   
 	\item \textbf{Convolution Layer 1:} The input to this layer is a preprocessed tensor image from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 16 channel feature map. 
 	
 	\item \textbf{ReLU Layer 1:} This layer applies a relu activation function to the 16 channel feature map.
 	 
-	 \item \textbf{Max Pooling Layer 1:} This layer down-samples the 256x256 16 channel feature map to 128x128 16 channel feature map.
+	 \item \textbf{Max Pooling Layer 1:} This layer down-samples the 256 x 256 16 channel feature map to 128 x 128 16 channel feature map.
 	 
-	 \item \textbf{Convolution Layer 2:} The input to this layer is the 16 channel 128x128 feature map from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
+	 \item \textbf{Convolution Layer 2:} The input to this layer is the 16 channel 128 x 128 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
 	 
 	 \item \textbf{ReLU Layer 2:} This layer applies a relu activation function to the 32 channel feature map.
 	 
-	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128x128 32 channel feature map to 64x64 32 channel feature map.
+	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128 x 128 32 channel feature map to 64 x 64 32 channel feature map.
 	 
 	 \item \textbf{Flattening Layer: } This layer flattens the 2D feature map to 1D feature map. 
 	 
@@ -130,7 +140,7 @@ The implementation details of our model is as follows:
 	 
 \end{enumerate}
 
-\section*{2.2 Training the CNN Model}
+\subsection{Training the CNN Model}
 To train a deep learning model, the follwoing parameters are considered:
 \begin{enumerate}
 	\item \textbf{Epoch:} An epoch describes the number of times the algorithm sees the entire data set. So, each time the algorithm has seen all samples in the dataset, an epoch has completed.
@@ -149,12 +159,12 @@ The implemented model is trained using the below mentioned configuration:
 The model is trained with the given training dataset as per the below mentioned algorithm:
 \begin{enumerate}
 	\item Initialize the CNN model with default parameters. 
-	\item Create an instance of adam optimizer for setting the learning rate
+	\item Create an instance of Adam optimizer for setting the learning rate
 	\item Create an instance of cross entropy loss
 	\item Initialize the optimizer with zero gradients \label{grad_clear}
-	\item Feed a training input image from the curret batch to the model to perform forward propogation
-	\item After the completion of forward propoigation, calculate the cross entropy loss
-	\item Perform backpropogation to minimize the loss
+	\item Feed a training input image from the current batch to the model to perform forward propagation
+	\item After the completion of forward propagation, calculate the cross entropy loss
+	\item Perform backpropagation to minimize the loss
 	\item Update gradients
 	\item Iterate through step \ref{grad_clear} for all the batches in the training dataset
 	\item Repeat the above steps for the given number of epochs
@@ -166,22 +176,23 @@ The model is trained with the given training dataset as per the below mentioned 
 Please refer the appendix for the python implementation of the above described model. 
 \newpage
 
-\section*{3 Results}
+\section{Results}
 The implemented model was trained using a learning rate of 0.001 
 
 
  
 \newpage
-\section*{4 References}
-[1] \url{https://www.stopbullying.gov/cyberbullying/what-is-it/index.html} \\ \newline
-[2] \url{https://www.forbes.com/sites/bernardmarr/2018/10/01/what-is-deep-learning-ai-a-simple-guide-with-8-practical-examples/#434cffaa8d4b} \\ \newline
-[3] \url{https://en.wikipedia.org/wiki/Convolutional_neural_network#Convolutional} \\ \newline
-[4] \url{https://cs231n.github.io/convolutional-networks/} \\ \newline
-[5] \url{https://machinelearningmastery.com/dropout-for-regularizing-deep-neural-networks/}
-
+\section{References}
+\begin{enumerate}[label={[\arabic*]}]
+\item \url{https://www.stopbullying.gov/cyberbullying/what-is-it/index.html}
+\item \url{https://www.forbes.com/sites/bernardmarr/2018/10/01/what-is-deep-learning-ai-a-simple-guide-with-8-practical-examples/#434cffaa8d4b}
+\item \url{https://en.wikipedia.org/wiki/Convolutional_neural_network#Convolutional}
+\item \url{https://cs231n.github.io/convolutional-networks/}
+\item \url{https://machinelearningmastery.com/dropout-for-regularizing-deep-neural-networks/}
+\end{enumerate}
 \newpage
 
-\section*{5 Appendix}
+\section{Appendix}
 
 
 
