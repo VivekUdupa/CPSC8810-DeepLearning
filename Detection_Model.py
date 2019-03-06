@@ -17,21 +17,21 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
 
         # Convolution Layer 1
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
+        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.relu1 = nn.ReLU()
 
         # Max Pooling 1
         self.maxpool1 = nn.MaxPool2d(kernel_size=2)
 
         # Convolution Layer 2
-        self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
+        self.cnn2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
         self.relu2 = nn.ReLU()
 
         # Max Pooling 2
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
 
         # Convolution Layer 3
-        self.cnn3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
+        self.cnn3 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=1, padding=1)
         self.relu3 = nn.ReLU()
         
         # Max Pooling 3
@@ -42,11 +42,15 @@ class CNNModel(nn.Module):
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(64*image_size*image_size, 500)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(64*image_size*image_size, 100)  #32 channels, 7x7 final image size
         
         self.relu4 = nn.ReLU()
         
-        self.fc2 = nn.Linear(500, 9)  #32 channels, 7x7 final image size
+        self.fc2 = nn.Linear(100, 50)  #32 channels, 7x7 final image size
+        
+        self.relu5 = nn.ReLU()
+        
+        self.fc3 = nn.Linear(50, 9)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
@@ -69,12 +73,14 @@ class CNNModel(nn.Module):
         # Max pool 2
         out = self.maxpool2(out)
         
+        '''
         # Convolution 3
         out = self.cnn3(out)
         out = self.relu3(out)
 
         # Max pool 2
         out = self.maxpool3(out)
+        '''
         
         # Resize the tensor, -1 decides the best dimension automatically
         #out = out.view(out.size(0), -1)
@@ -89,6 +95,10 @@ class CNNModel(nn.Module):
         out = self.relu4(out)
 
         out = self.fc2(out)
+        
+        out = self.relu5(out)
+
+        out = self.fc3(out)
         
         # Return
         return out

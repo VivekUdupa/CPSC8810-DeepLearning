@@ -12,7 +12,7 @@ from shutil import copyfile
 from Detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 30
+n_epoch         = 10
 n_class         = 9
 batch_size      = 1
 learning_rate   = 0.0001
@@ -29,8 +29,8 @@ dtype = torch.float
 # Sorting out the data
 
 # Image parameters
-n_cnn = 3 #Number of CNN layer
-img_size = (312,312)
+n_cnn = 2 #Number of CNN layer
+img_size = (512,512)
 conv_size = int( img_size[0]/ (2**n_cnn) ) # image_size / 8 for 3 cnn layer. i.e 2**3 = 8
 train_img = "../TrainingData"
 Model = "./Model"

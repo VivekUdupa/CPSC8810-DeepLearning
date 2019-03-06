@@ -14,8 +14,8 @@ from Detection_Model import CNNModel
 # loading the input test image
 test_img_filename = sys.argv[1]
 
-img_size = (312, 312)
-n_cnn = 3
+img_size = (512, 512)
+n_cnn = 2
 conv_size = int( img_size[0]/(2**n_cnn) )
 test_img  = "./TestData/test/"
 test_img1  = "./TestData"
