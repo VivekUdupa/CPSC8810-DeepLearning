@@ -14,8 +14,8 @@ from Detection_Model import CNNModel
 # loading the input test image
 test_img_filename = sys.argv[1]
 
-img_size = (512, 512)
-n_cnn = 2
+img_size = (256, 256)
+n_cnn = 3
 conv_size = int( img_size[0]/(2**n_cnn) )
 test_img  = "./TestData/test/"
 test_img1  = "./TestData"
@@ -72,7 +72,7 @@ with torch.no_grad():
     for images, labels in test_loader:
         images = Variable(images).cuda()
         labels = Variable(labels).cuda()
-        outputs = model(images)
+        outputs = model(images).cuda()
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()
