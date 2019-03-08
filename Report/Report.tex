@@ -141,6 +141,7 @@ The implementation details of our model is as follows:
 \end{enumerate}
 
 \subsection{Training the CNN Model}
+\label{model_train}
 To train a deep learning model, the following parameters are considered:
 \begin{enumerate}
 	\item \textbf{Epoch:} An epoch describes the number of times the algorithm sees the entire data set. So, each time the algorithm has seen all samples in the dataset, an epoch has completed.
@@ -151,9 +152,9 @@ To train a deep learning model, the following parameters are considered:
 
 The implemented model is trained using the below mentioned configuration:
 \begin{enumerate}
-	\item Epoch = 50	
+	\item Epoch = 25	
 	\item Batch Size = 1
-	\item Learning Rate = 0.001
+	\item Learning Rate = 0.0001
 \end{enumerate}
 
 The model is trained with the given training dataset as per the below mentioned algorithm:
@@ -177,9 +178,83 @@ Please refer the appendix for the python implementation of the above described m
 \newpage
 
 \section{Results}
+The network described in section \ref{model_train} was trained using 2494 images split into 10 categories. For a batch size of 1, 15 epochs and a learning rate of 0.0001, the following results were observed. \\
+
+\noindent
+The training accuracy(single execution) was found to be 98.08\% . \\
+
+\noindent
+The network was tested using the following images. \\
+
+\noindent
+The image for the first test is pulled out from the training dataset. Figure \ref{fig:quarrel} belongs to the \lq{quarrel}\rq{} category. The purpose of this test is to check if the network can recognize an image from the training dataset. 
+\begin{figure}[H]
+\centering
+  \includegraphics[width=.4\linewidth]{./Images/quarrel.jpg}
+  \caption{quarrel}
+  \label{fig:quarrel}
+\end{figure}
+The network classified Figure \ref{fig:quarrel} as \lq{quarrel}\rq{} category. \\
+
+\noindent
+The images used for the further tests are images that the network has never seen during the training phase. The purpose of these tests is to check if the network has learned any features based upon which it can categorize images into its respective categories. \\
+
+A Human being would classify Figure \ref{fig:gossip1} as two girls in the foreground gossiping about the third girl in the background. Thus this image falls under the \lq{gossiping}\rq{} category. 
+\begin{figure}[H]
+\centering
+  \includegraphics[width=.4\linewidth]{./Images/gossiping1.jpg}
+  \caption{gossiping}
+  \label{fig:gossip1}
+\end{figure}
+The network classified Figure \ref{fig:gossip1} to be in the  \lq{strangle}\rq{} category. \\
+
+Upon inspection, Figure \ref{fig:gossip2} appears to comprise of two girls in the background gossiping about the girl in the foreground. Again this is an instance of \lq{gossiping}\rq{}
+\begin{figure}[H]
+\centering
+  \includegraphics[width=.4\linewidth]{./Images/gossiping2.jpg}
+  \caption{Another instance of gossiping}
+  \label{fig:gossip2}
+\end{figure}
+The network classified Figure \ref{fig:gossip2} to be in the \lq{isolation}\rq{} category. \\
+
+Figure \ref{fig:isolation} is quiet straightforward. It represents a girl not being accepted/included in a group of kids. Thus this image falls under the \lq{isolation}\rq{} category. \\
+\begin{figure}[H]
+\centering
+  \includegraphics[width=.4\linewidth]{./Images/isolation1.jpg}
+  \caption{isolation}
+  \label{fig:isolation}
+\end{figure}
+The network classified Figure \ref{fig:isolation} as \lq{punching}\rq{} category. \\
+
+\newpage
+
+\section{Conclusion}
+The goal of this project is to develop a deep neural network that taken an image as input and categorizes it into one of the 10 below mentioned categories.
+\begin{enumerate}
+	\item Gossiping
+	\item Isolation
+	\item Laughing
+	\item Pulling hair
+	\item Punching
+	\item Quarrel
+	\item Strangle
+	\item Slapping
+	\item Stabbing
+	\item Non bullying
+\end{enumerate}  
+
+The neural network was developed using PyTorch. The training dataset for the network was made up of 2494 images belonging to the 10 above mentioned categories. The training accuracy for a single run was observed to be 98\%. Four testing examples are mentioned in this report. \\
+
+When the network was presented with an image from the training dataset, it had no problem in predicting the category of the image. The image for this test was taken from the \lq{quarrel}\rq{} category(Figure \ref{fig:quarrel}) and the network predicted it correctly. This confirms that the network actually recognizes the training images and it is not just randomly predicting the image category. \\
+
+For the next three tests, the network was given images that it had never seen before. Here the network is expected to recognize a set of features(in the test image) that it has learnt in the training phase to predict the category of bullying. \\
+
+When the network was tested with Figure \ref{fig:gossip1}, Which is an instance of \lq{gossiping}\rq{} the network wrongly classified it as \lq{strangle}\rq{}. Since the subject in Figure \ref{fig:gossip1} seem to be very close to each other, the network confuses it with \lq{strangling}\rq{}. The reason for this wrong prediction could be that the network has not learnt enough features to clearly distinguish between strangling and gossiping. A deeper network with more complex structure could help the network extract more features. \\
 
 
 
+
+ 
  
 \newpage
 \section{References}
