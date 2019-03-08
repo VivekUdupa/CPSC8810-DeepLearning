@@ -9,13 +9,13 @@ from torch.autograd import Variable
 import sys # For command Line arguments
 import os
 from shutil import copyfile
-from Detection_Model import CNNModel
+from detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 100
+n_epoch         = 20
 n_class         = 10
-batch_size      = 10
-learning_rate   = 0.000001
+batch_size      = 1
+learning_rate   = 0.0001
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -24,7 +24,7 @@ print(torch.cuda.device_count())
 print(torch.cuda.get_device_name(0))
 
 #To run on GPU
-device = torch.device("cuda:0")
+device = torch.device("cuda:1")
 dtype = torch.float
 # Sorting out the data
 
@@ -99,7 +99,7 @@ for epoch in range(n_epoch):
 
         # Prit loss and accuracy
         if (i + 1) % 100 == 0:
-            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
+            print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
 
 # Saving the trained model            
 if not os.path.exists(Model):

@@ -9,7 +9,7 @@ from torch.autograd import Variable
 import sys # For command Line arguments
 import os
 from shutil import copyfile
-from Detection_Model import CNNModel
+from detection_Model import CNNModel
 
 # loading the input test image
 test_img_filename = sys.argv[1]
@@ -22,7 +22,7 @@ test_img1  = "./TestData"
 Model = "./Model"
 
 # Hyperparameter initialization
-batch_size      = 10
+batch_size      = 1
 
 if not os.path.exists(test_img):
     os.makedirs(test_img)
@@ -63,7 +63,7 @@ model.eval().cuda()
 def ten_to_str(x):
 	""" Function to convert tensor label to a string """
 	value = x.data[0] #Convert to data
-	str_label = ["gossiping", "isolation", "laughing", "nonbully", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
+	str_label = ["gossiping", "isolation", "laughing", "nonbullying", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
 	return str_label[value]
 
 # Testing the model

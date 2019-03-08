@@ -17,21 +17,21 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
 
         # Convolution Layer 1
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=4, kernel_size=3, stride=1, padding=1)
+        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
         self.relu1 = nn.ReLU()
 
         # Max Pooling 1
         self.maxpool1 = nn.MaxPool2d(kernel_size=2)
 
         # Convolution Layer 2
-        self.cnn2 = nn.Conv2d(in_channels=4, out_channels=8, kernel_size=3, stride=1, padding=1)
+        self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.relu2 = nn.ReLU()
 
         # Max Pooling 2
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
 
         # Convolution Layer 3
-        self.cnn3 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=3, stride=1, padding=1)
+        self.cnn3 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=1, padding=1)
         self.relu3 = nn.ReLU()
         
         # Max Pooling 3
@@ -42,21 +42,17 @@ class CNNModel(nn.Module):
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(16*image_size*image_size, 10000)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(32*image_size*image_size, 5000)  #32 channels, 7x7 final image size
         self.relu4 = nn.ReLU()
-        self.dropout = nn.Dropout(p=0.5)
         
-        self.fc2 = nn.Linear(10000, 5000)  #32 channels, 7x7 final image size
+        self.fc2 = nn.Linear(5000, 500)  #32 channels, 7x7 final image size
         self.relu5 = nn.ReLU()
-        self.dropout = nn.Dropout(p=0.5)
         
-        self.fc3 = nn.Linear(5000, 2500)  #32 channels, 7x7 final image size
+        self.fc3 = nn.Linear(500, 250)  #32 channels, 7x7 final image size
         self.relu6 = nn.ReLU()
-        self.dropout = nn.Dropout(p=0.5)
         
-        self.fc4 = nn.Linear(2500, 100)  #32 channels, 7x7 final image size
+        self.fc4 = nn.Linear(250, 100)  #32 channels, 7x7 final image size
         self.relu7 = nn.ReLU()
-        self.dropout = nn.Dropout(p=0.3)
         
         self.fc5 = nn.Linear(100, 10)  #32 channels, 7x7 final image size
 	
@@ -104,7 +100,6 @@ class CNNModel(nn.Module):
 
         out = self.fc3(out)
         out = self.relu5(out)
-        out = self.dropout(out)
 
         out = self.fc4(out)
         out = self.relu6(out)
