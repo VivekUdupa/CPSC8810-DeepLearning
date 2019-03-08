@@ -22,7 +22,7 @@ test_img1  = "./TestData"
 Model = "./Model"
 
 # Hyperparameter initialization
-batch_size      = 1
+batch_size      = 10
 
 if not os.path.exists(test_img):
     os.makedirs(test_img)
@@ -45,6 +45,7 @@ transform = transforms.Compose( [transforms.Resize(img_size),
                                  transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
+                                 #transforms.Normalize((0.5),(0.5))
                                  ])
 
 
@@ -53,7 +54,7 @@ test_dataset = datasets.ImageFolder(root=test_img1, transform=transform)
 test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 
 # Image parameters
-n_class         = 9
+n_class         = 10
 
 model = CNNModel(conv_size, n_class).cuda()
 model.load_state_dict(torch.load('./Model/mark1.pth'))
@@ -62,7 +63,7 @@ model.eval().cuda()
 def ten_to_str(x):
 	""" Function to convert tensor label to a string """
 	value = x.data[0] #Convert to data
-	str_label = ["gossiping", "isolation", "laughing", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
+	str_label = ["gossiping", "isolation", "laughing", "nonbully", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
 	return str_label[value]
 
 # Testing the model

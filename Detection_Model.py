@@ -56,9 +56,9 @@ class CNNModel(nn.Module):
         
         self.fc4 = nn.Linear(2500, 100)  #32 channels, 7x7 final image size
         self.relu7 = nn.ReLU()
-        self.dropout = nn.Dropout(p=0.5)
+        self.dropout = nn.Dropout(p=0.3)
         
-        self.fc5 = nn.Linear(100, 9)  #32 channels, 7x7 final image size
+        self.fc5 = nn.Linear(100, 10)  #32 channels, 7x7 final image size
 	
 	#Image size = 28x28 -> 13x13 after first pooling
 	#14x14 after padding = 1
@@ -104,6 +104,7 @@ class CNNModel(nn.Module):
 
         out = self.fc3(out)
         out = self.relu5(out)
+        out = self.dropout(out)
 
         out = self.fc4(out)
         out = self.relu6(out)

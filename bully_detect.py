@@ -12,10 +12,10 @@ from shutil import copyfile
 from Detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 60
-n_class         = 9
+n_epoch         = 1
+n_class         = 10
 batch_size      = 10
-learning_rate   = 0.0001
+learning_rate   = 0.000001
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -40,6 +40,7 @@ transform = transforms.Compose( [transforms.Resize(img_size),
                                  transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
+                                 #transforms.Normalize((0.5),(0.5))
                                  ])
 
 # Training dataset
