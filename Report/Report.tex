@@ -16,7 +16,7 @@
 \usepackage[section]{placeins} %Prevents floats before a section
 \usepackage{textcomp} %For degree symbol
 \usepackage{enumerate} %For roman numbers
-\usepackage{enumitem} %for reference numbers
+%\usepackage{enumitem} %for reference numbers
 \usepackage{titling} %For the centering of title page
 \usepackage{url} %for URL linebreak
 \usepackage{breakurl} % for URL line break
@@ -24,6 +24,7 @@
 \usepackage{exsheets} %For itemize in a line
 \usepackage{tasks} %For itemize in a line
 %\usepackage[inline]{enumitem}    %For itemize in a line
+\usepackage[inline, shortlabels]{enumitem}
 
 %----------------------------PYTHON TEMPLATE -------------------------------------
 \usepackage{listings}
@@ -175,15 +176,25 @@ The implementation details of our model is as follows:
 	 
 	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128 x 128 32 channel feature map to 64 x 64 32 channel feature map.
 	 
+	 \item \textbf{Convolution Layer 3:} The input to this layer is the 32 channel 64 x 64 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
+	 
+	 \item \textbf{ReLU Layer 3:} This layer applies a relu activation function to the 32 channel feature map.
+	 
+	 \item \textbf{Max Pooling Layer 3:} This layer down-samples the 64 x 64 32 channel feature map to 32 x 32 32 channel feature map.
+	 
 	 \item \textbf{Flattening Layer: } This layer flattens the 2D feature map to 1D feature map. 
 	 
 	 \item \textbf{Dropout Layer:} This layer randomly zeros some of the element of the input tensor with probability 0.4. 
 	 
-	 \item \textbf{Fully Connected Layer 1:} This layer maps the feature map into 100 neurons.
+	 \item \textbf{Fully Connected Layer 1 and Relu layer 3:} This layer maps the 1D feature map into 5000 neurons. 
 	 
-	 \item \textbf{ReLU Layer 3:} This layer applies a relu activation function to the output of Fully Connected Layer 1.
+	 \item \textbf{Fully Connected Layer 2 and Relu layer 4:} This layer maps the 5000 neurons to 500 neurons.
 	 
-	 \item \textbf{Fully Connected Layer 2:} This layer maps 100 neurons into 10 categories of classification.
+	 \item \textbf{Fully Connected Layer 3 and Relu layer 5:} This layer maps 500 neurons into 250 neurons.
+	 	 
+	 \item \textbf{Fully Connected Layer 4 and Relu layer 6:} This layer maps 250 neurons into 100 neurons.
+	 	 
+	 \item \textbf{Fully Connected Layer 5 and softmax:} This layer maps 100 neurons into 10 categories of classification and softmax for normalization. 
 	 
 \end{enumerate}
 
@@ -225,7 +236,7 @@ Please refer the appendix for the python implementation of the above described m
 \newpage
 
 \section{Results}
-The network described in section \ref{sec:model_def} was trained using 2494 images split into 10 categories. For a batch size of 1, 15 epochs and a learning rate of 0.0001, the following results were observed. \\
+The network described in section \ref{sec:model_def} was trained using 2494 images split into 10 categories. For a batch size of 1, 25 epochs and a learning rate of 0.0001, the following results were observed. \\
 
 \noindent
 The training accuracy(single execution) was found to be 98.08\% . \\
@@ -234,11 +245,11 @@ The training accuracy(single execution) was found to be 98.08\% . \\
 The network was tested using the following images. \\
 
 \noindent
-The image for the first test is pulled out from the training dataset. Figure \ref{fig:quarrel} belongs to the \lq{quarrel}\rq{} category. The purpose of this test is to check if the network can recognize an image from the training dataset. 
+The image for the first test is pulled out from the training dataset. Figure \ref{fig:quarrel} is an image of two women involved in a heated argument and thus the image belongs to the \lq{quarrel}\rq{} category. The purpose of this test is to check if the network can recognize an image from the training dataset. 
 \begin{figure}[H]
 \centering
-  \includegraphics[width=.4\linewidth]{./Images/quarrel.jpg}
-  \caption{quarrel}
+  \includegraphics[width=.6\linewidth]{./Images/quarrel.jpg}
+  \caption{Test image from the \lq{quarrel}\rq{} category}
   \label{fig:quarrel}
 \end{figure}
 The network classified Figure \ref{fig:quarrel} as \lq{quarrel}\rq{} category. \\
@@ -249,8 +260,8 @@ The images used for the further tests are images that the network has never seen
 A Human being would classify Figure \ref{fig:gossip1} as two girls in the foreground gossiping about the third girl in the background. Thus this image falls under the \lq{gossiping}\rq{} category. 
 \begin{figure}[H]
 \centering
-  \includegraphics[width=.4\linewidth]{./Images/gossiping1.jpg}
-  \caption{gossiping}
+  \includegraphics[width=.6\linewidth]{./Images/gossiping1.jpg}
+  \caption{Test image of two girls gossiping in the foreground}
   \label{fig:gossip1}
 \end{figure}
 The network classified Figure \ref{fig:gossip1} to be in the  \lq{strangle}\rq{} category. \\
@@ -258,17 +269,18 @@ The network classified Figure \ref{fig:gossip1} to be in the  \lq{strangle}\rq{}
 Upon inspection, Figure \ref{fig:gossip2} appears to comprise of two girls in the background gossiping about the girl in the foreground. Again this is an instance of \lq{gossiping}\rq{}
 \begin{figure}[H]
 \centering
-  \includegraphics[width=.4\linewidth]{./Images/gossiping2.jpg}
-  \caption{Another instance of gossiping}
+  \includegraphics[width=.6\linewidth]{./Images/gossiping2.jpg}
+  \caption{Test image of two girls gossiping in the background}
   \label{fig:gossip2}
 \end{figure}
 The network classified Figure \ref{fig:gossip2} to be in the \lq{isolation}\rq{} category. \\
+\\
 
-Figure \ref{fig:isolation} is quiet straightforward. It represents a girl not being accepted/included in a group of kids. Thus this image falls under the \lq{isolation}\rq{} category. \\
+Figure \ref{fig:isolation} is quiet straightforward. This is a picture of a girl being excluded from a group of friends. Thus this image falls under the \lq{isolation}\rq{} category. \\
 \begin{figure}[H]
 \centering
-  \includegraphics[width=.4\linewidth]{./Images/isolation1.jpg}
-  \caption{isolation}
+  \includegraphics[width=.6\linewidth]{./Images/isolation1.jpg}
+  \caption{Test image of isolation}
   \label{fig:isolation}
 \end{figure}
 The network classified Figure \ref{fig:isolation} as \lq{punching}\rq{} category. \\
@@ -276,8 +288,8 @@ The network classified Figure \ref{fig:isolation} as \lq{punching}\rq{} category
 \newpage
 
 \section{Conclusion}
-The goal of this project is to develop a deep neural network that taken an image as input and categorizes it into one of the 10 below mentioned categories.
-\begin{enumerate}
+The goal of this project is to develop a deep neural network that takes an image as input and categorizes it into one of the 10 below mentioned categories of bullying. \\
+\begin {enumerate*} [1) ]%
 	\item Gossiping
 	\item Isolation
 	\item Laughing
@@ -288,20 +300,20 @@ The goal of this project is to develop a deep neural network that taken an image
 	\item Slapping
 	\item Stabbing
 	\item Non bullying
-\end{enumerate}
+\end {enumerate*} \\
 The neural network was developed using PyTorch. The training dataset for the network was made up of 2494 images belonging to the 10 above mentioned categories. The training accuracy for a single run was observed to be 98\%. Four testing examples are mentioned in this report. \\
 
 When the network was presented with an image from the training dataset, it had no problem in predicting the category of the image. The image for this test was taken from the \lq{quarrel}\rq{} category(Figure \ref{fig:quarrel}) and the network predicted it correctly. This confirms that the network actually recognizes the training images and it is not just randomly predicting the image category. \\
 
-For the next three tests, the network was given images that it had never seen before. Here the network is expected to recognize a set of features(in the test image) that it has learnt in the training phase to predict the category of bullying. \\
+For the next three tests, the network was given images that it had never seen before. Here the network is expected to recognize a set of features(in the test image) that it has learnt through the training phase to predict the category of bullying. \\
 
-When the network was tested with Figure \ref{fig:gossip1}, Which is an instance of \lq{gossiping}\rq{} the network wrongly classified it as \lq{strangle}\rq{}. Since the subject in Figure \ref{fig:gossip1} seem to be very close to each other, the network confuses it with \lq{strangling}\rq{}. The reason for this wrong prediction could be that the network has not learnt enough features to clearly distinguish between strangling and gossiping. A deeper network with more complex structure could help the network extract more features. \\
+When the network was tested with Figure \ref{fig:gossip1}, which is an instance of \lq{gossiping}\rq{} the network wrongly classified it as \lq{strangle}\rq{}. Since the subject in Figure \ref{fig:gossip1} seem to be very close to each other, the network confuses it with \lq{strangling}\rq{}. The reason for this wrong prediction could be that the network has not learnt enough features to clearly distinguish between strangling and gossiping. A deeper network with more complex structure could help the network extract more features. \\
 
 Figure \ref{fig:gossip2} is a complicated image compared to the other test images. This image could either be gossiping or isolation. The girl in the foreground appears to be isolated from the group in the background who are gossiping. The network classified this image to be of the \lq{isolation}\rq{} category. This is probably because the network weighs the foreground subject more than the background. Having a bounding box label would probably help the network prioritize the subject more accurately. \\
 
 Figure \ref{fig:isolation} clearly falls under the \lq{isolation}\rq{} category. But the network classified it as punching. Over-fitting could be the cause for this result. Adding a better dropout layer might refrain the network from over-fitting. \\
 
-In conclusion the model defined in section \ref{sec:model_def} is shallow. Such a basic CNN struggles to deal with images that does not directly fall under a single category of bullying. Having an object detection model such as the YOLO or the RCNN would help in better image classification. Having a pre-trained model like the Resnet or the VGG-16 would improve the test accuracy significantly. The type of image labeling also plays a significant role. Having boundary box labeling might aid the network in more accurate subject prioritization.   
+In conclusion the model defined in section \ref{sec:model_def} is shallow. Such a basic CNN struggles to deal with images that does not directly fall under a single category of bullying. Having an object detection model such as the YOLO or the RCNN would help in better image classification. Having a pre-trained model like the Resnet or the VGG-16 would improve the test accuracy significantly. The type of image labeling used also plays a significant role. Having boundary box labeling might aid the network in more accurate subject prioritization.   
 
 
 \section{Future Work}
