@@ -57,7 +57,7 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch
 n_class         = 10
 
 model = CNNModel(conv_size, n_class).cuda()
-model.load_state_dict(torch.load('./Model/mark1.pth'))
+model.load_state_dict(torch.load('./Model/model.pth'))
 model.eval().cuda()
 
 def ten_to_str(x):

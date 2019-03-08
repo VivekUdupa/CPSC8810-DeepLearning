@@ -104,5 +104,5 @@ for epoch in range(n_epoch):
 # Saving the trained model            
 if not os.path.exists(Model):
     os.makedirs(Model)
-torch.save(model.state_dict(), "./Model/mark1.pth")
-print("Model saved at ./Model/mark1.pth")
+torch.save(model.state_dict(), "./Model/model.pth")
+print("Model saved at ./Model/model.pth")
