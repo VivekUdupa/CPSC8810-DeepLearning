@@ -1,7 +1,7 @@
- A deep learning algorithm to classify images with cyberbully actions. 
+A deep learning algorithm to classify images with cyberbully actions. 
 
 Project Team:
-1. Shashi Kumar Honnahalli Shivaraju (shonnah@clemson.edu)
+1. Shashi Shivaraju (shonnah@clemson.edu)
 2. Vivek Koodli Udupa (vkoodli@clemson.edu)
 
 ====================================================
@@ -27,16 +27,6 @@ The CNN network structure is as follows:
 18) Softmax
 19) Output
 
-====================================================
-Testing:
-====================================================
-test.py takes a single image file as argument. The image file must be in the jpeg/jpg format. Currently it is the only supported format.
-
-execution example:
-
-$python test.py an_image.jpg
-
-This code will load the model named 'model.pth' from the 'Model' folder. Please make sure to have the trianed model named as 'model.pth' in a folder named 'Model' and place the folder in the same location as the test.py script. 
 
 ====================================================
 File Descriptions:
@@ -51,3 +41,22 @@ README.txt			This file
 REPORT/				This folder consists of the Midterm Report.
 PyTorch_Exercise/		This folder consists of practice codes used while getting used to working with PyTorch 
 
+
+====================================================
+Testing:
+====================================================
+test.py takes a single image file as argument. The image file must be in the jpeg/jpg format.
+Currently it is the only supported format.
+
+execution example:
+
+$python test.py an_image.jpg
+
+This code will load the model named 'model.pth' from the 'Model' folder.
+Please make sure to have the trianed model named as 'model.pth' in a folder named 'Model' and place the folder in the same location as the test.py script. 
+
+====================================================
+Reference Papers:
+====================================================
+1. https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf
+2. https://arxiv.org/pdf/1505.01197.pdf
