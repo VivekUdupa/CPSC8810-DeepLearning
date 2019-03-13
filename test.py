@@ -22,7 +22,7 @@ test_img1  = "./TestData"
 Model = "./Model"
 
 # Hyperparameter initialization
-batch_size      = 1
+batch_size      = 100
 
 if not os.path.exists(test_img):
     os.makedirs(test_img)
@@ -42,7 +42,7 @@ copyfile(test_img_filename, test_img+test_img_filename)
     
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
-                                 transforms.Grayscale(num_output_channels=1),
+                                 #transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
                                  #transforms.Normalize((0.5),(0.5))
