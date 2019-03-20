@@ -12,9 +12,9 @@ from shutil import copyfile
 from detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 100
+n_epoch         = 20
 n_class         = 10
-batch_size      = 100
+batch_size      = 1
 learning_rate   = 0.0001
 
 # check if GPU is available
@@ -24,20 +24,20 @@ print(torch.cuda.device_count())
 print(torch.cuda.get_device_name(0))
 
 #To run on GPU
-device = torch.device("cuda:0")
+device = torch.device("cuda:1")
 dtype = torch.float
 # Sorting out the data
 
 # Image parameters
 n_cnn = 3 #Number of CNN layer
 img_size = (256,256)
-conv_size = int( img_size[0]/ (2**(n_cnn+1)) ) # image_size / 8 for 3 cnn layer. i.e 2**3 = 8
+conv_size = int( img_size[0]/ (2**n_cnn) ) # image_size / 8 for 3 cnn layer. i.e 2**3 = 8
 train_img = "../TrainingData"
 Model = "./Model"
 
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
-                                 #transforms.Grayscale(num_output_channels=1),
+                                 transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
                                  #transforms.Normalize((0.5),(0.5))
@@ -51,9 +51,8 @@ train_dataset = datasets.ImageFolder(root=train_img, transform=transform)
 train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
   
 # Instance creation
-#model = CNNModel(conv_size, n_class).cuda()
-model = nn.DataParallel(CNNModel(conv_size, n_class))
-model = model.to(device)
+model = CNNModel(conv_size, n_class).cuda()
+
 # Create instance of loss
 criterion = nn.CrossEntropyLoss()
 
@@ -69,16 +68,13 @@ for epoch in range(n_epoch):
     correct = 0
     for i, (images, labels) in enumerate(train_loader):
         # Wrap into Variable
-        #images = Variable(images).cuda()
-        #labels = Variable(labels).cuda()
-        images = Variable(images).to(device)
-        labels = Variable(labels).to(device)
+        images = Variable(images).cuda()
+        labels = Variable(labels).cuda()
 
         # Clear the gradients
         optimizer.zero_grad()
 
         # Forward propogation
-        #outputs = model(images).cuda()
         outputs = model(images)
 
         # Loss calculation ( softmax )
@@ -102,7 +98,7 @@ for epoch in range(n_epoch):
         correct += (predicted == labels).sum().item()
 
         # Prit loss and accuracy
-        if (i + 1) % 5 == 0:
+        if (i + 1) % 100 == 0:
             print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
 
 # Saving the trained model            
