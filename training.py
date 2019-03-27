@@ -12,9 +12,9 @@ from shutil import copyfile
 from detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 100
+n_epoch         = 250
 n_class         = 10
-batch_size      = 100
+batch_size      = 50
 learning_rate   = 0.0001
 
 # check if GPU is available
@@ -102,7 +102,7 @@ for epoch in range(n_epoch):
         correct += (predicted == labels).sum().item()
 
         # Prit loss and accuracy
-        if (i + 1) % 5 == 0:
+        if (i + 1) % 10 == 0:
             print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
 
 # Saving the trained model            

@@ -16,10 +16,12 @@ test_img_filename = sys.argv[1]
 
 img_size = (256, 256)
 n_cnn = 3
-conv_size = int( img_size[0]/(2**n_cnn) )
+conv_size = int( img_size[0]/(2**(n_cnn + 1)) )
 test_img  = "./TestData/test/"
 test_img1  = "./TestData"
 Model = "./Model"
+
+device = torch.device("cuda:0")
 
 # Hyperparameter initialization
 batch_size      = 100
@@ -56,9 +58,12 @@ test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch
 # Image parameters
 n_class         = 10
 
-model = CNNModel(conv_size, n_class).cuda()
+#model = CNNModel(conv_size, n_class).cuda()
+model = nn.DataParallel(CNNModel(conv_size, n_class))
+model = model.to(device)
 model.load_state_dict(torch.load('./Model/model.pth'))
-model.eval().cuda()
+#model.eval().cuda()
+model.eval().to(device)
 
 def ten_to_str(x):
 	""" Function to convert tensor label to a string """
@@ -71,9 +76,11 @@ with torch.no_grad():
     correct = 0
     total = 0
     for images, labels in test_loader:
-        images = Variable(images).cuda()
-        labels = Variable(labels).cuda()
-        outputs = model(images).cuda()
+        #images = Variable(images).cuda()
+        #labels = Variable(labels).cuda()
+        images = Variable(images).to(device)
+        labels = Variable(labels).to(device)
+        outputs = model(images)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum().item()

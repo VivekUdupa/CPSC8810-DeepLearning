@@ -46,13 +46,13 @@ class CNNModel(nn.Module):
 
         # Fully connected linear layer
         #self.fc1 = nn.Linear(32*75*75 , 9)  #32 channels, 75x75 final image size
-        self.fc1 = nn.Linear(64*image_size*image_size, 7000)  #32 channels, 7x7 final image size
+        self.fc1 = nn.Linear(64*image_size*image_size, 4096)  #32 channels, 7x7 final image size
         self.relu4 = nn.ReLU()
         
-        self.fc2 = nn.Linear(7000, 100)  #32 channels, 7x7 final image size
+        self.fc2 = nn.Linear(4096, 1000)  #32 channels, 7x7 final image size
         self.relu5 = nn.ReLU()
         
-        self.fc3 = nn.Linear(100, 10)  #32 channels, 7x7 final image size
+        self.fc3 = nn.Linear(1000, 10)  #32 channels, 7x7 final image size
         
         
 	
