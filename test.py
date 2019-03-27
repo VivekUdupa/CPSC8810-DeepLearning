@@ -10,13 +10,14 @@ import sys # For command Line arguments
 import os
 from shutil import copyfile
 from detection_Model import CNNModel
+from PIL import Image
 
 # loading the input test image
 test_img_filename = sys.argv[1]
 
-img_size = (256, 256)
+img_size = (256,256)
 n_cnn = 3
-conv_size = int( img_size[0]/(2**(n_cnn + 1)) )
+conv_size = int(img_size[0] /(2**(n_cnn + 1)) )
 test_img  = "./TestData/test/"
 test_img1  = "./TestData"
 Model = "./Model"
@@ -24,8 +25,9 @@ Model = "./Model"
 device = torch.device("cuda:0")
 
 # Hyperparameter initialization
-batch_size      = 100
+batch_size      = 1
 
+'''
 if not os.path.exists(test_img):
     os.makedirs(test_img)
     
@@ -39,8 +41,8 @@ for the_file in os.listdir(test_img):
     except Exception as e:
         print(e)
 
-
 copyfile(test_img_filename, test_img+test_img_filename)
+'''
     
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
@@ -52,8 +54,11 @@ transform = transforms.Compose( [transforms.Resize(img_size),
 
 
 # Testing dataset
-test_dataset = datasets.ImageFolder(root=test_img1, transform=transform)
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
+#test_dataset = datasets.ImageFolder(root=test_img1, transform=transform)
+#test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
+test_dataset = Image.open(test_img_filename)
+test_loader = transform(test_dataset).float()
+
 
 # Image parameters
 n_class         = 10
@@ -75,17 +80,21 @@ def ten_to_str(x):
 with torch.no_grad():
     correct = 0
     total = 0
-    for images, labels in test_loader:
+    for images in test_loader:
         #images = Variable(images).cuda()
         #labels = Variable(labels).cuda()
-        images = Variable(images).to(device)
-        labels = Variable(labels).to(device)
+        images = Variable(images, requires_grad=True)
+        #images = images.unsqueeze(0)
+        images = images.cuda()
+        #labels = Variable(labels).to(device)
         outputs = model(images)
+        print("After Output")
         _, predicted = torch.max(outputs.data, 1)
-        total += labels.size(0)
-        correct += (predicted == labels).sum().item()
+        #total += labels.size(0)
+        #correct += (predicted == labels).sum().item()
         #if (predicted!=labels):
         #	print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
+        predicted = predicted.item()
        	print("{}".format(ten_to_str(predicted)))
 
 

@@ -12,9 +12,9 @@ from shutil import copyfile
 from detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 250
+n_epoch         = 1 
 n_class         = 10
-batch_size      = 50
+batch_size      = 1 
 learning_rate   = 0.0001
 
 # check if GPU is available
@@ -37,7 +37,7 @@ Model = "./Model"
 
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
-                                 #transforms.Grayscale(num_output_channels=1),
+                                 transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
                                  #transforms.Normalize((0.5),(0.5))
