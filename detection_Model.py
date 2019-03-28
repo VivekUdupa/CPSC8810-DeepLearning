@@ -64,7 +64,6 @@ class CNNModel(nn.Module):
         """ Forward Propogation for classification """
         
         # Convolution 1
-        print("shape of image before cnn1 = ", x.shape)
         out = self.cnn1(x)
         out = self.relu1(out)
         
@@ -73,7 +72,6 @@ class CNNModel(nn.Module):
         out = self.dropout(out)
 
         # Convolution 2
-        print("shape of image before cnn2 = ", out.shape)
         out = self.cnn2(out)
         out = self.relu2(out)
 
