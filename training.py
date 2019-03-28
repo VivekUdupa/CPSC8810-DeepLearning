@@ -37,7 +37,7 @@ Model = "./Model"
 
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
-                                 transforms.Grayscale(num_output_channels=1),
+                                 #transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
                                  #transforms.Normalize((0.5),(0.5))

@@ -57,7 +57,8 @@ transform = transforms.Compose( [transforms.Resize(img_size),
 #test_dataset = datasets.ImageFolder(root=test_img1, transform=transform)
 #test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=batch_size, shuffle=False)
 test_dataset = Image.open(test_img_filename)
-test_loader = transform(test_dataset).float()
+test_loader = transform(test_dataset)
+print("shape of image before at load: ", test_loader.shape)
 
 
 # Image parameters
@@ -72,21 +73,24 @@ model.eval().to(device)
 
 def ten_to_str(x):
 	""" Function to convert tensor label to a string """
-	value = x.data[0] #Convert to data
+	#value = x.data[0] #Convert to data
 	str_label = ["gossiping", "isolation", "laughing", "nonbullying", "pullinghair", "punching", "quarrel", "slapping", "stabbing", "strangle"]
-	return str_label[value]
+	return str_label[x]
 
 # Testing the model
 with torch.no_grad():
     correct = 0
     total = 0
-    for images in test_loader:
+    for images1 in test_loader:
         #images = Variable(images).cuda()
         #labels = Variable(labels).cuda()
-        images = Variable(images, requires_grad=True)
-        #images = images.unsqueeze(0)
+        images = Variable(test_loader, requires_grad=True)
+        images = images.unsqueeze(0)
         images = images.cuda()
+        #images = Variable(images).to(device)
         #labels = Variable(labels).to(device)
+        print("shape of image before model: ", images.shape)
+        #print("shape of label before model: ", labels.shape)
         outputs = model(images)
         print("After Output")
         _, predicted = torch.max(outputs.data, 1)
@@ -95,6 +99,7 @@ with torch.no_grad():
         #if (predicted!=labels):
         #	print("predicted: {} | Actual: {}, total: {} ".format(ten_to_str(predicted), ten_to_str(labels), total))
         predicted = predicted.item()
+        print("predicted is", predicted)
        	print("{}".format(ten_to_str(predicted)))
 
 

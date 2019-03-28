@@ -17,7 +17,7 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
 
         # Convolution Layer 1
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=2, padding=1)
+        self.cnn1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=2, padding=1)
         self.relu1 = nn.ReLU()
 
         # Max Pooling 1
@@ -64,6 +64,7 @@ class CNNModel(nn.Module):
         """ Forward Propogation for classification """
         
         # Convolution 1
+        print("shape of image before cnn1 = ", x.shape)
         out = self.cnn1(x)
         out = self.relu1(out)
         
@@ -72,6 +73,7 @@ class CNNModel(nn.Module):
         out = self.dropout(out)
 
         # Convolution 2
+        print("shape of image before cnn2 = ", out.shape)
         out = self.cnn2(out)
         out = self.relu2(out)
 
