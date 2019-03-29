@@ -17,7 +17,7 @@ class CNNModel(nn.Module):
         super(CNNModel, self).__init__() # Super is used to refer to the base class, i.e nn.Module
 
         # Convolution Layer 1
-        self.cnn1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=3, stride=1, padding=1)
+        self.cnn1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=1, padding=1)
         self.relu1 = nn.ReLU()
 
         # Max Pooling 1

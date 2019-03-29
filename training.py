@@ -12,10 +12,10 @@ from shutil import copyfile
 from detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 20
+n_epoch         = 400
 n_class         = 10
-batch_size      = 1
-learning_rate   = 0.0001
+batch_size      = 100
+learning_rate   = 0.000001
 
 # check if GPU is available
 print(torch.cuda.current_device())
@@ -37,10 +37,8 @@ Model = "./Model"
 
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
-                                 transforms.Grayscale(num_output_channels=1),
                                  transforms.ToTensor(),
                                  transforms.Normalize((0.5, 0.5, 0.5),(0.5, 0.5, 0.5))
-                                 #transforms.Normalize((0.5),(0.5))
                                  ])
 
 # Training dataset
@@ -98,7 +96,7 @@ for epoch in range(n_epoch):
         correct += (predicted == labels).sum().item()
 
         # Prit loss and accuracy
-        if (i + 1) % 100 == 0:
+        if (i + 1) % 10 == 0:
             print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}, Accuracy: {:.2f}%, correct = {} | total = {}'.format(epoch + 1, n_epoch, i + 1, len(train_loader), loss.item(), (correct / total) * 100, correct, total))
 
 # Saving the trained model            
