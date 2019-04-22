@@ -18,7 +18,7 @@ class CNNModel(nn.Module):
 
         # Convolution Layer 1
         self.cnn1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=2, padding=1)
-        self.relu1 = nn.ReLU()
+        self.cnnBN1 = nn.BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
 
         # Max Pooling 1
         self.maxpool1 = nn.MaxPool2d(kernel_size=2)
@@ -27,8 +27,8 @@ class CNNModel(nn.Module):
 
         # Convolution Layer 2
         self.cnn2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1, padding=1)
-        self.relu2 = nn.ReLU()
-
+        self.cnnBN2 = nn.BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        
         # Max Pooling 2
         self.maxpool2 = nn.MaxPool2d(kernel_size=2)
         
@@ -36,7 +36,7 @@ class CNNModel(nn.Module):
 
         # Convolution Layer 3
         self.cnn3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1, padding=1)
-        self.relu3 = nn.ReLU()
+        self.cnnBN3 = nn.BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
         
         # Max Pooling 3
         self.maxpool3 = nn.MaxPool2d(kernel_size=2)
@@ -63,28 +63,28 @@ class CNNModel(nn.Module):
     def forward(self, x):
         """ Forward Propogation for classification """
         
-        # Convolution 1
+        #CNN layer 1
         out = self.cnn1(x)
-        out = self.relu1(out)
-        
-        # Max pool 1
+        out = self.cnnBN1(x)
         out = self.maxpool1(out)
-        out = self.dropout(out)
+        out = F.relu(out)
 
-        # Convolution 2
-        out = self.cnn2(out)
-        out = self.relu2(out)
-
-        # Max pool 2
-        out = self.maxpool2(out)
         out = self.dropout(out)
         
-        # Convolution 3
+        #CNN layer 2
+        out = self.cnn2(out)
+        out = self.cnnBN2(x)
+        out = self.maxpool2(out)
+        out = F.relu(out)
+        
+        out = self.dropout(out)
+        
+        #CNN layer 3
         out = self.cnn3(out)
-        out = self.relu3(out)
-
-        # Max pool 2
+        out = self.cnnBN3(x)
         out = self.maxpool3(out)
+        out = self.relu3(out)
+        
         out = self.dropout(out)
         
         # Resize the tensor, -1 decides the best dimension automatically
@@ -96,12 +96,13 @@ class CNNModel(nn.Module):
 
         # Fully connected 1
         out = self.fc1(out)
-        out = self.relu4(out)
+        out = F.relu(out)
 
         out = self.fc2(out)
-        out = self.relu5(out)
+        out = F.relu(out)
 
         out = self.fc3(out)
-        
+       
+        out = F.log_softmax(out)
         # Return
         return out
