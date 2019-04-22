@@ -18,6 +18,11 @@ class CNNModel(nn.Module):
 
         # Convolution Layer 1
         self.cnn1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, stride=2, padding=1)
+        
+        # Xavier Initialization
+        nn.init.xavier_uniform_(self.cnn1.weight)
+        
+        # Batch Normalization
         self.cnnBN1 = nn.BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
 
         # Max Pooling 1
@@ -65,7 +70,7 @@ class CNNModel(nn.Module):
         
         #CNN layer 1
         out = self.cnn1(x)
-        out = self.cnnBN1(x)
+        out = self.cnnBN1(out)
         out = self.maxpool1(out)
         out = F.relu(out)
 
@@ -73,7 +78,7 @@ class CNNModel(nn.Module):
         
         #CNN layer 2
         out = self.cnn2(out)
-        out = self.cnnBN2(x)
+        out = self.cnnBN2(out)
         out = self.maxpool2(out)
         out = F.relu(out)
         
@@ -81,9 +86,9 @@ class CNNModel(nn.Module):
         
         #CNN layer 3
         out = self.cnn3(out)
-        out = self.cnnBN3(x)
+        out = self.cnnBN3(out)
         out = self.maxpool3(out)
-        out = self.relu3(out)
+        out = F.relu(out)
         
         out = self.dropout(out)
         
@@ -103,6 +108,6 @@ class CNNModel(nn.Module):
 
         out = self.fc3(out)
        
-        out = F.log_softmax(out)
+        out = F.log_softmax(out, dim=0)  #Softmax along Row
         # Return
         return out
