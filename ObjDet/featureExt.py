@@ -347,7 +347,6 @@ x = conv1(out_map)
 pred_anchor_locs = reg_layer(x)
 pred_cls_scores = cls_layer(x)
 
-__DEBUG__ = 1
 if __DEBUG__:
     print("predicted class score shape: ", pred_cls_scores.shape)
     print("predicted anchor location shape: ", pred_anchor_locs.shape)
@@ -382,5 +381,53 @@ n_train_post_nms = 2000 # number of bboxes after nms during training
 n_test_pre_nms = 6000 # number of bboxes before nms during testing
 n_test_post_nms = 300 # number of bboxes after nms during testing
 min_size = 16 # minimum height of the object required to create a proposal
+
+# Convert anchors from [ymin, xmin, ymax, xmax] to [center_Y, center_x, h, w] format
+anc_height = anchors[:, 2] - anchors[:, 0]
+anc_width = anchors[:, 3] - anchors[:, 1]
+anc_ctr_y = anchors[:, 0] + 0.5 * anc_height
+anc_ctr_x = anchors[:, 1] + 0.5 * anc_width
+
+# Convert prediction locations and objectness score to numpy array
+pred_anchor_locs_numpy = pred_anchor_locs[0].data.numpy()
+objectness_score_numpy = objectness_score[0].data.numpy()
+
+dy = pred_anchor_locs_numpy[:, 0::4]
+dx = pred_anchor_locs_numpy[:, 1::4]
+dh = pred_anchor_locs_numpy[:, 2::4]
+dw = pred_anchor_locs_numpy[:, 3::4]
+
+ctr_y = dy * anc_height[:, np.newaxis] + anc_ctr_y[:, np.newaxis]
+ctr_x = dx * anc_width[:, np.newaxis] + anc_ctr_x[:, np.newaxis]
+h = np.exp(dh) * anc_height[:, np.newaxis]
+w = np.exp(dw) * anc_width[:, np.newaxis] 
+
+# Region of Interest 
+roi = np.zeros(pred_anchor_locs_numpy.shape, dtype=pred_anchor_locs_numpy.dtype)
+roi[:, 0::4] = ctr_y - 0.5 * h
+roi[:, 1::4] = ctr_x - 0.5 * w
+roi[:, 2::4] = ctr_y + 0.5 * h
+roi[:, 3::4] = ctr_x + 0.5 * w
+
+# Clip the predicted boxes to the image size
+roi[:, slice(0, 4, 2)] = np.clip(roi[:, slice(0, 4, 2)], 0, image_size[0])
+roi[:, slice(1, 4, 2)] = np.clip(roi[:, slice(1, 4, 2)], 0, image_size[1])
+
+if __DEBUG__:
+    print("Region of interest: ", roi)
+
+# Remove predicted boxes with either height of width < threshold
+hs = roi[:, 2] - roi[:, 0]
+ws = roi[:, 3] - roi[:, 1]
+keep = np.where((hs >= min_size) & (ws >= min_size))[0]
+roi = roi[keep, :]
+score = objectness_score_numpy[keep]
+
+# Sort (proposal, score) in descending order
+order = score.ravel().argsort()[::-1]
+
+# Take top values?
+order = order[:n_train_pre_nms]
+roi = roi[order, :]
 
 
