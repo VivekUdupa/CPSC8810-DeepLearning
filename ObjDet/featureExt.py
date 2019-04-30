@@ -181,6 +181,96 @@ for num1, i in enumerate(anchor_valid):
     ya1, xa1, ya2, xa2 = i
     # anchor area = height * width
     area_anchor = (ya2 - ya1) * (xa2 - xa1)
+    for num2, j in enumerate(bbox):
+        yb1, xb1, yb2, xb2 = j
+        area_box = (yb2 - yb1) * (xb2 - xb1)
+
+        intersection_x1 = max([xb1, xa1])
+        intersection_y1 = max([yb1, ya1])
+        intersection_x2 = min([xb2, xa2])
+        intersection_y2 = min([yb2, ya2])
+
+        # Check for intersection
+        if (intersection_x1 < intersection_x2) and (intersection_y1 < intersection_y2):
+            area_intersection = (intersection_y2 - intersection_y1) * (intersection_x2 - intersection_x1)
+            #intersection over union
+            iou = area_intersection / (area_anchor + area_box - area_intersection)
+        else:
+            # In case of No overlap/ intersection
+            iou = 0.
+        
+        ious[num1, num2] = iou
+
+if __DEBUG__:
+    print("all the iou count: ", ious.shape)
+        
+# Case-1
+# Highest IoU for each gt and corrosponding anchor
+# Location of max Iou
+gt_argmax_ious = ious.argmax(axis=0)
+if __DEBUG__:
+    print("Indices of MAX IoU: ", gt_argmax_ious)
+
+# Value of Max IoU
+gt_max_ious = ious[gt_argmax_ious, np.arange(ious.shape[1])]
+if __DEBUG__:
+    print("Values of MAX IoU: ", gt_max_ious)
+
+# Case-2
+# Highest Iou In between every anchor
+argmax_ious = ious.argmax(axis=1)
+if __DEBUG__:
+    print("shape of argmax_ious: ", argmax_ious.shape)
+    print("MAX Iou indices for every anchor: ", argmax_ious)
+
+max_ious = ious[np.arange(len(index_inside)), argmax_ious]
+if __DEBUG__:
+    print("MAX IoU values: ", max_ious)
+
+# Anchor Box that has the HIGHEST IoU with GT
+gt_argmax_ious = np.where(ious == gt_max_ious)[0]
+if __DEBUG__:
+    print("Ultimate MAX IoU: ", gt_argmax_ious)
+
+# Assigning Labels which helps to compute Loss
+# Defining thresholds
+pos_thres = 0.7
+neg_thres = 0.3
+
+# Assign negative label (0) to all anchors that have IoU < 0.3
+label[max_ious < neg_thres] = 0
+
+# Assign positive label (1) to anchor boxes with  highest IoU with GT
+label[gt_argmax_ious] = 1
+
+# Assign positive label (1) to anchor boxes with IoU > 0.7
+label[max_ious >= pos_thres] = 1
+
+
+# ==============================================================================
+#                               TRAINING RPN
+# ==============================================================================
+
+# Define positive and negative anchor sample parameters
+num_samples = 128
+pos_ratio = 0.5
+num_pos = pos_ratio * num_samples
+
+# Picking Positive Samples
+pos_index = np.where(label == 1)[0]
+
+if len(pos_index) > num_pos:
+    disable_index = np.random.choice(pos_index, size=(len(pos_index) - num_pos), replace=False)
+    label[disable_index] = -1
+
+# Picking Negative Samples
+num_neg = num_samples * np.sum(label == 1) 
+neg_index = np.where(label == 0)[0]
+
+if len(neg_index) > num_neg:
+    disable_index = np.random.choice(neg_index, size=(len(neg_index) - num_neg), replace=False)
+    label[disable_index] = -1
+
 
 
 
