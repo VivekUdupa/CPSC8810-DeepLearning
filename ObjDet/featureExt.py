@@ -2,6 +2,7 @@
 import torch
 import torchvision
 import torch.nn as nn
+import numpy as np
 import matplotlib.pyplot as plt
 from torchvision import transforms
 from PIL import Image
@@ -61,4 +62,83 @@ frcnn_fe = nn.Sequential(*req_fetrs)
 out_map = frcnn_fe(image)
 
 if __DEBUG__:
-    print("Out map size is: ", out_map.size())
+    print("Out map size is: ", out_map)
+
+# Creating Anchors
+# ----------------------
+# Define 3 ratio and scales that we will be using
+ratio = [0.5, 1, 2]
+anchor_scales = [8, 16, 32]
+
+# Number of Ratios and anchor scales
+n_ratio = len(ratio)
+n_scales = len(anchor_scales)
+
+# Base for the anchor
+anchor_base = np.zeros((n_ratio * n_scales, 4), dtype=np.float32)
+
+if __DEBUG__:
+    print("anchor base is: \n", anchor_base)
+
+# Define center for base anchor
+center_y = sub_sample / 2.
+center_x = sub_sample / 2.
+
+if __DEBUG__:
+    print("Center for base anchor is: (%s, %s) " %(center_x, center_y))
+
+# Generating Anchos for first feature map pixel
+# Iterate through all ratios and scales
+for i in range(n_ratio):
+    for j in range(n_scales):
+        h = sub_sample * anchor_scales[j] * np.sqrt(ratio[i])
+        w = sub_sample * anchor_scales[j] * np.sqrt(1. / ratio[i])
+
+        index = i * n_scales + j
+
+        anchor_base[index, 0] = center_y - h / 2. #y_min
+        anchor_base[index, 1] = center_x - w / 2. #x_min
+        anchor_base[index, 2] = center_y + h / 2. #y_max
+        anchor_base[index, 3] = center_x + w / 2. #x_max
+
+if __DEBUG__:
+    print("anchor bases: \n", anchor_base)
+    print("Negative anchors represent the ones that are out of the image boundaries")
+
+# Generationg anchors for all feature map pixels
+feature_size = (image_size[0] // sub_sample)
+# 16 sub_samples in feature map where each has dimension 16*16
+center_x = np.arange(sub_sample, (feature_size +  1) * 16, 16)
+center_y = np.arange(sub_sample, (feature_size +  1) * 16, 16)
+
+# Generation Centers
+center = np.zeros((len(center_x) * len(center_y), 2))
+index = 0
+for x in range(len(center_x)):
+    for y in range(len(center_y)):
+        center[index, 1] = center_x[x] - int(sub_sample / 2)
+        center[index, 0] = center_y[y] - int(sub_sample / 2)
+        index += 1
+
+# Generating anchors for above generated centers
+num_anchors_per_pixel = n_ratio * n_scales
+anchors = np.zeros(((feature_size * feature_size * num_anchors_per_pixel), 4))
+
+index = 0
+for c in center:
+    center_y, center_x = c
+    for i in range(n_ratio):
+        for j in range(n_scales):
+            h = sub_sample * anchor_scales[j] * np.sqrt(ratio[i])
+            w = sub_sample * anchor_scales[j] * np.sqrt(1. / ratio[i])
+
+            anchors[index, 0] = center_y - h / 2.
+            anchors[index, 1] = center_x - w / 2.
+            anchors[index, 2] = center_y + h / 2.
+            anchors[index, 3] = center_x + w / 2.
+            index += 1
+
+if __DEBUG__:
+    print("Total anchors size is: ", anchors.shape)
+
+
