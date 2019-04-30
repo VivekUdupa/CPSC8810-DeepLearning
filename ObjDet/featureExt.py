@@ -271,6 +271,43 @@ if len(neg_index) > num_neg:
     disable_index = np.random.choice(neg_index, size=(len(neg_index) - num_neg), replace=False)
     label[disable_index] = -1
 
+# GT with MAX IoU for each anchor
+max_iou_bbox = bbox[argmax_ious]
 
+# Convert [ymin, xmin, ymax, xmax] format to [center_y, center_x, h, w] format
 
+height = anchor_valid[:, 2] - anchor_valid[:, 0]
+width  = anchor_valid[:, 3] - anchor_valid[:, 1]
+center_y  = anchor_valid[:, 0] + 0.5 * height
+center_x  = anchor_valid[:, 1] + 0.5 * width
+
+base_height = max_iou_bbox[:, 2] - max_iou_bbox[:, 0]
+base_width = max_iou_bbox[:, 3] - max_iou_bbox[:, 1]
+base_center_y = max_iou_bbox[:, 0] + 0.5 * base_height
+base_center_x = max_iou_bbox[:, 1] + 0.5 * base_width
+
+# Find the locations
+eps = np.finfo(height.dtype).eps
+height = np.maximum(height, eps)
+width = np.maximum(width, eps)
+
+dy = (base_center_y - center_y) / height
+dx = (base_center_x - center_x) / width
+dh = np.log(base_height / height)
+dw = np.log(base_width / width)
+
+anchor_locs = np.vstack((dy, dx, dh, dw)).transpose()
+if __DEBUG__:
+    print("Shape of anchor locations", anchor_locs.shape)
+    print("Anchor locations", anchor_locs)
+
+# Final Labels
+anchor_labels = np.empty((len(anchors),), dtype=label.dtype)
+anchor_labels.fill(-1)
+anchor_labels[index_inside] = label
+
+# Final Locations
+anchor_locations = np.empty((len(anchors),) + anchors.shape[1:], dtype=anchor_locs.dtype)
+anchor_locations.fill(0)
+anchor_locations[index_inside, :] = anchor_locs
 
