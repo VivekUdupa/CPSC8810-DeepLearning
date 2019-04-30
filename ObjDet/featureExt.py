@@ -141,4 +141,46 @@ for c in center:
 if __DEBUG__:
     print("Total anchors size is: ", anchors.shape)
 
+# Labeling the anchors
+#[Ymin, Xmin, Ymax, Xmax] format
+bbox = np.asarray([[20, 30, 200, 150],[150, 200, 220, 250]], dtype=np.float32) 
+labels = np.asarray([6, 8])
+
+# Find the index of the anchors that are inside the image boundary
+index_inside = np.where(
+                (anchors[:, 0] >= 0) &
+                (anchors[:, 1] >= 0) &
+                (anchors[:, 2] <= image_size[1]) &
+                (anchors[:, 3] <= image_size[0]) 
+                )[0]
+
+if __DEBUG__:
+    print("anchors that are insdie the image are: \n", index_inside)
+    print("\nNumber of anchors inside the image boundary: ", index_inside.shape)
+
+# Make a label array and fill it with -1
+label = np.empty((len(index_inside), ), dtype=np.int32)
+label.fill(-1)
+
+if __DEBUG__:
+    print("Created Label size is %s and index inside size is %s" %(label.size, index_inside.size))
+
+# Array with valid anchor boxes
+anchor_valid = anchors[index_inside]
+
+if __DEBUG__:
+    print("Valid anchor box shape is: ", anchor_valid.shape)
+
+# Calculate IoU for valid anchor boxes
+ious = np.empty((len(anchor_valid), 2), dtype=np.float32)
+if __DEBUG__:
+    print("Bounding Boxes are : \n", bbox)
+
+for num1, i in enumerate(anchor_valid):
+    # ymin, xmin, ymax, xmax format for anchors
+    ya1, xa1, ya2, xa2 = i
+    # anchor area = height * width
+    area_anchor = (ya2 - ya1) * (xa2 - xa1)
+
+
 
