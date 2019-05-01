@@ -114,7 +114,7 @@ Deep Learning Model to Detect Cyberbully Actions in Images}
 \begin{abstract}
 \thispagestyle{plain}
 \addcontentsline{toc}{section}{\bf Abstract}
-This report explains the process involved in  a Convolutional Neural Network to detect and classify various cyberbully actions in an image. 
+This report explains the process involved in implementing a Faster-RCNN model in order to detect and classify various cyberbully actions in an image. 
 \end{abstract}
 \newpage
 
@@ -130,20 +130,26 @@ Cyberbullying is bullying that takes place over digital devices like cell phones
 
 Deep learning is a subset of machine learning where artificial neural networks, algorithms inspired by the human brain, learn from large amounts of data. The term  ‘deep learning’ because the neural networks have various (deep) layers that enable learning. Deep learning allows machines to solve complex problems even when using a data set that is very diverse, unstructured and inter-connected. The more deep learning algorithms learn, the better they perform. [2] \\
 
-This report describes modeling of a deep learning network based on the concept of convolutional neural network for detecting and classifying cyberbully actions for a given image. The cyberbullying actions considered in this project are laughing, pulling-hair, quarrel, slapping, punching, stabbing, gossiping, strangle and isolation. The designed model is trained using the provided image dataset which contain above mentioned 9 categories of cyberbully actions in them.   
+This report describes modeling of a convolutional neural network for detecting and classifying cyberbully actions for a given image along with a RCNN model inorder to identify predator and victim present in that image. The cyberbullying actions considered in this project are laughing, pulling-hair, quarrel, slapping, punching, stabbing, gossiping, strangle and isolation. The CNN is trained using the provided image dataset which contain above mentioned 9 categories of cyberbully actions in them. The proposed RCNN is trained using provided images ground truth bounding boxes for predator and victim classes.    
 
 \newpage
 
 \section{Methods}
 In deep learning, a convolutional neural network (CNN, or ConvNet) is a class of deep neural networks, most commonly applied to analyzing visual imagery.[3] A convolutional neural network consists of an input and an output layer, as well as multiple hidden layers. The hidden layers of a CNN typically consist of convolutional layers, ReLU layer i.e. activation function, pooling layers, fully connected layers and normalization layers.[4] \\ 
 
-Convolutional networks were inspired by biological processes in that the connectivity pattern between neurons resembles the organization of the animal visual cortex. CNNs use relatively little pre-processing compared to other image classification algorithms. This means that the network learns the filters that in traditional algorithms were hand-engineered. This independence from prior knowledge and human effort in feature design is a major advantage. \\
+The implemented CNN model classifies the given input image into one of the nine categories of cyberbully actions. In order to further detect the predator and victim in the classified cyberbully image, an object detection model must be used. This can be achieved using a Region based Convolutional Neural Network(RCNN). \\
+
+In R-CNN the CNN is forced to focus on a single region at a time because that way interference is minimized because it is expected that only a single object of interest will dominate in a given region. The regions in the R-CNN are detected by selective search algorithm followed by resizing so that the regions are of equal size before they are fed to a CNN for classification and bounding box regression. The drawback of RCNN is that selective search algorithm is computation expensive. In order to overcome this drawback Faster RCNN(F-RCNN) is proposed. \\
+
+F-RCNN approach is similar to the R-CNN algorithm. But, instead of feeding the region proposals to the CNN, the input image is fed to the CNN to generate a convolutional feature map. From the convolutional feature map, region of proposals are identified and warped into squares(Bounding Boxes) and by using a RoI(Region of Interest) pooling layer, region proposals are reshaped into fixed sizes so that it can be fed into a fully connected layer. Class of the proposed region and the offset of the bounding boxes are calculated by performing softmax on the RoI feature vector(Final layer of fully connected network)[6] \\ 
 
 The implementation of our model based on CNN using an open source machine learning library PyTorch is described in the section below. 
 
+\newpage
+
 \subsection{Implementation of CNN Model}
 \label{sec:model_def}
-Our model is implemented using the following layers: 
+Our CNN model for classification is implemented using the following layers: 
 \begin{enumerate}
 	\item {\textbf{Convolutional Layer:}} The convolutional layer is the core building block of a CNN. The layer's parameters consist of a set of learnable filters (or kernels). During the forward pass, each filter is convolved across the width and height of the input volume, computing the dot product between the entries of the filter and the input and producing a 2-dimensional activation map of that filter. As a result, the network learns filters that activate when it detects some specific type of feature at some spatial position in the input.
 	
@@ -162,44 +168,46 @@ Our model is implemented using the following layers:
 
 The implementation details of our model is as follows: 
 \begin{enumerate}
-	\item \textbf{Image Pre-Processing: } The given input image is converted into mono-channeled, gray scale image of size 256 x 256. Then it is converted to a PyTorch tensor image and its values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
+	\item \textbf{Image Pre-Processing: } The given image is resized to (256 x 256)pixels. Then the images are randomly flipped or rotated for the purpose of data augmentation. Then it is converted to a PyTorch tensor image and its values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
   
-	\item \textbf{Convolution Layer 1:} The input to this layer is a preprocessed tensor image from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 16 channel feature map. 
+	\item \textbf{Convolution Layer 1\textunderscore 1:} The input to this layer is a preprocessed 3 channel tensor image from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 64 channel feature map. Xavier initialization is used to initialize the weights of this layer. 
 	
 	\item \textbf{ReLU Layer 1:} This layer applies a relu activation function to the 16 channel feature map.
+
+	\item \textbf{Convolution Layer 1\textunderscore 2 and ReLU:} The input to this layer is a 64 channel feature map from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 64 channel feature map. The output is normalized using ReLU.  
+
+	 \item \textbf{Batch Normalization: } This layer performs batch normalization inorder to avoid overfitting. 	
+	 	 
+	 \item \textbf{Max Pooling Layer 1:} This layer down-samples the 256 x 256 64 channel feature map to 128 x 128 64 channel feature map.
 	 
-	 \item \textbf{Max Pooling Layer 1:} This layer down-samples the 256 x 256 16 channel feature map to 128 x 128 16 channel feature map.
+	 \item \textbf{Convolution Layer 2\textunderscore 1 and ReLU:} The input to this layer is the 64 channel 128 x 128 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 128 channel feature map. ReLU activation is used to normalize the outputs.  
 	 
-	 \item \textbf{Convolution Layer 2:} The input to this layer is the 16 channel 128 x 128 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
+	 \item \textbf{Convolution Layer 2\textunderscore 2 and ReLU:} The input to this layer is the 128 channel 128 x 128 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. ReLU activation is used to normalize the outputs.  
 	 
-	 \item \textbf{ReLU Layer 2:} This layer applies a relu activation function to the 32 channel feature map.
+	 \item \textbf{Batch Normalization: } This layer performs batch normalization inorder to avoid overfitting.
+	 	 
+	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128 x 128 128 channel feature map to 64 x 64 128 channel feature map.
 	 
-	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128 x 128 32 channel feature map to 64 x 64 32 channel feature map.
+	 \item \textbf{Convolution 3 with ReLU:} Similar to above convolution layers, Convolution 3 has 3 convolution layers, Convolution Layer 3\textunderscore 1, Convolution Layer 3\textunderscore 2 and Convolution Layer 3\textunderscore 3. The output of this layer is 64 x 64 512 channel feature map. 
+	 	 
+	 \item \textbf{Max Pooling Layer 3:} This layer down-samples the 64 x 64 512 channel feature map to 32 x 32 512 channel feature map.
 	 
-	 \item \textbf{Convolution Layer 3:} The input to this layer is the 32 channel 64 x 64 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
-	 
-	 \item \textbf{ReLU Layer 3:} This layer applies a relu activation function to the 32 channel feature map.
-	 
-	 \item \textbf{Max Pooling Layer 3:} This layer down-samples the 64 x 64 32 channel feature map to 32 x 32 32 channel feature map.
+	 \item \textbf{Convolution 4 and Convolution 5 with ReLU: } These two layers have similar configurations and structure as the Convolution 3 layer. The final output is a 8 x 8 512 channel feature map. 
 	 
 	 \item \textbf{Flattening Layer: } This layer flattens the 2D feature map to 1D feature map. 
 	 
 	 \item \textbf{Dropout Layer:} This layer randomly zeros some of the element of the input tensor with probability 0.4. 
 	 
-	 \item \textbf{Fully Connected Layer 1 and Relu layer 3:} This layer maps the 1D feature map into 5000 neurons. 
+	 \item \textbf{Fully Connected Layer 1 and Relu layer 3:} This layer maps the 1D feature map into 4096 neurons. 
 	 
-	 \item \textbf{Fully Connected Layer 2 and Relu layer 4:} This layer maps the 5000 neurons to 500 neurons.
+	 \item \textbf{Fully Connected Layer 2 and Relu layer 4:} This layer maps the 4096 neurons to 1000 neurons.
 	 
-	 \item \textbf{Fully Connected Layer 3 and Relu layer 5:} This layer maps 500 neurons into 250 neurons.
-	 	 
-	 \item \textbf{Fully Connected Layer 4 and Relu layer 6:} This layer maps 250 neurons into 100 neurons.
-	 	 
-	 \item \textbf{Fully Connected Layer 5 and softmax:} This layer maps 100 neurons into 10 categories of classification and softmax for normalization. 
+	 \item \textbf{Fully Connected Layer 3 and softmax:} This layer maps 1000 neurons into 10 categories of classification and softmax for normalization. 
 	 
 \end{enumerate}
 
 \subsection{Training the CNN Model}
-\label{model_train}
+\label{CNN_train}
 To train a deep learning model, the following parameters are considered:
 \begin{enumerate}
 	\item \textbf{Epoch:} An epoch describes the number of times the algorithm sees the entire data set. So, each time the algorithm has seen all samples in the dataset, an epoch has completed.
@@ -210,9 +218,9 @@ To train a deep learning model, the following parameters are considered:
 
 The implemented model is trained using the below mentioned configuration:
 \begin{enumerate}
-	\item Epoch = 25	
-	\item Batch Size = 1
-	\item Learning Rate = 0.0001
+	\item Epoch = 100	
+	\item Batch Size = 10
+	\item Learning Rate = 0.001
 \end{enumerate}
 
 The model is trained with the given training dataset as per the below mentioned algorithm:
@@ -231,6 +239,43 @@ The model is trained with the given training dataset as per the below mentioned 
 	
 \end{enumerate}
 
+\subsection{Implementation of FRCNN Model}
+\begin{figure}[H]
+\centering
+  \includegraphics[width=\linewidth]{./Images/FRCNN_model.png}
+  \caption{Faster-RCNN block diagram. The magenta colored blocks are active only during training. The numbers indicate size of the tensors[7].}
+  \label{fig:FRCNN_model}
+\end{figure}
+
+The steps taken to develop FRCNN is as follows:
+\begin{enumerate}
+	\item Pre-train a CNN network on image classification tasks as described in section \ref{CNN_train}
+	\item Fine-tune the RPN (Region Proposal Network) end-to-end for the region proposal task, which is initialized by the pre-train image classifier. Positive samples have IoU (Intersection-over-Union) $>$ 0.7, while negative samples have IoU $<$ 0.3. 
+	\begin{enumerate}
+		\item Slide a small n x n spatial window over the convolution feature map of the entire image.
+		\item At the center of each sliding window, we predict multiple regions of various scales and ratios simultaneously. An anchor is a combination of (sliding window center, scale, ratio). 
+	\end{enumerate}
+	\item Train a Fast R-CNN object detection model using the proposals generated by the current RPN
+	\item Then use the Fast R-CNN network to initialize RPN training. While keeping the shared convolutional layers, only fine-tune the RPN-specific layers. At this stage, RPN and the detection network have shared convolutional layers.
+	\item Finally fine-tune the unique layers of Fast R-CNN
+	\item Step 4-5 can be repeated to train RPN and Fast R-CNN alternatively if needed.
+\end{enumerate}
+
+Loss functions for the FRCNN is calculated as follows:
+\begin{align}
+	L_{box}(\{p_i\},\{t_i\}) &= \frac{1}{N_{cls}}\sum_{i}{}L_{cls}(p_i, p_i^*) + \frac{\lambda}{N_{box}}\sum_{i}{}p_i^* \cdot L_i^{smoott}(t_i - t_i^*) \\	
+	L_{cls}(p_i, p_i^*) &= -p_i^* logp_i - (1 - p_i^*)log(1 - p_i) \\
+	L &= L_{cls} + L_{box}
+\end{align} where 
+\begin{align*}
+	p_i &= \text{Predicted probability of anchor i being an object} \\
+	p_i* &= \text{Ground truth label (binary) of whether anchor i is an object} \\
+	t_i &= \text{Predicted four parameterized coordinates} \\
+	t_i* &= \text{Ground truth coordinates} \\
+	N_{cls} &= \text{Normalization term, set to be mini-batch size (~256) in the paper} \\
+	N_{box} &= \text{Normalization term, set to the number of anchor locations (~2400) in the paper} \\
+	\lambda &= \text{A balancing parameter, set to be ~10 in the paper } 
+\end{align*}
 
 Please refer the appendix for the python implementation of the above described model. 
 \newpage
@@ -336,6 +381,8 @@ Based on the Results, the following changes are planned to improve the network a
 \item \url{https://en.wikipedia.org/wiki/Convolutional_neural_network#Convolutional}
 \item \url{https://cs231n.github.io/convolutional-networks/}
 \item \url{https://machinelearningmastery.com/dropout-for-regularizing-deep-neural-networks/}
+\item \url{https://towardsdatascience.com/r-cnn-fast-r-cnn-faster-r-cnn-yolo-object-detection-algorithms-36d53571365e}
+\item \url{https://medium.com/@whatdhack/a-deeper-look-at-how-faster-rcnn-works-84081284e1cd}
 \end{enumerate}
 \newpage
 
