@@ -430,4 +430,64 @@ order = score.ravel().argsort()[::-1]
 order = order[:n_train_pre_nms]
 roi = roi[order, :]
 
+# Calculate Region Proposals
+y1 = roi[:, 0]
+x1 = roi[:, 1]
+y2 = roi[:, 2]
+x2 = roi[:, 3]
 
+area = (x2 - x1 + 1) * (y2 - y1 + 1)
+order = score.argsort()[::-1]
+
+keep = []
+
+while order.size > 0:
+    i = order[0]
+    xx1 = np.maximum(x1[i], x1[order[1:]])
+    yy1 = np.maximum(y1[i], y1[order[1:]])
+    xx2 = np.minimum(x2[i], x2[order[1:]])
+    yy2 = np.minimum(y2[i], y2[order[1:]])
+
+    w = np.maximum(0.0, xx2 - xx1 + 1)
+    h = np.maximum(0.0, yy2 - yy1 + 1)
+    inter = w * h
+
+    ovr = inter / (area[i] + area[order[1:]] - inter)
+
+    inds = np.where(ovr <= nms_thresh)[0]
+    order = order[inds + 1]
+
+keep = keep[:n_train_post_nms]
+roi = roi[keep]
+
+# Proposal Targets
+n_sample = 128
+pos_ratio = 0.25
+pos_iou_thresh = 0.5
+neg_iou_thresh_hi = 0.5
+neg_iou_thresh_lo = 0.0
+
+# Calculate IoU
+ious = np.empty((len(roi), 2), dtype=np.float32)
+ious.fill(0)
+for num1, i in enumerate(roi):
+    ya1, xa1, ya2, xa2 = i
+    anchor_area = (ya2 - ya1) * (xa2 - xa1)
+    for num2, j in enumerate(bbox):
+        yb1, xb1, yb2, xb2 = j
+        box_area = (yb2 - yb1) * (xb2 - xb1)
+
+        inter_x1 = max([xb1, xa1])
+        inter_y1 = max([yb1, ya1])
+        inter_x2 = min([xb2, xa2])
+        inter_y2 = min([yb2, ya2])
+
+        if(inter_x1 < inter_x2) and (inter_y1 < inter_y2): 
+            inter_area = (inter_y2 - inter_y1) * (inter_x2 - inter_x1)
+            iou = inter_area / (anchor_area + box_area - inter_area)
+        else:
+            iou = 0.
+
+        ious[num1, num2] = iou
+print(ious.shape)
+print(roi)
