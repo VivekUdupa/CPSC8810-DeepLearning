@@ -12,7 +12,7 @@ from shutil import copyfile
 from detection_Model import CNNModel
 
 # Hyperparameter initialization
-n_epoch         = 50 
+n_epoch         = 100 
 n_class         = 10
 batch_size      = 10 
 learning_rate   = 0.0001

@@ -64,7 +64,7 @@ class CNNModel(nn.Module):
         self.maxpool4 = nn.MaxPool2d(kernel_size=2)
         
         # Dropout Regularization
-        self.dropout = nn.Dropout(p=0.8)
+        self.dropout = nn.Dropout(p=0.5)
 
         # Convolution Layer 5
         self.cnn5_1 = nn.Conv2d(in_channels=512, out_channels=512, kernel_size=3, stride=1, padding=1)
@@ -105,7 +105,7 @@ class CNNModel(nn.Module):
         out = self.cnnBN1(out)
         out = self.maxpool1(out)
 
-        out = self.dropout(out)
+        #out = self.dropout(out)
         
         #CNN layer 2
         out = self.cnn2_1(out)
@@ -115,7 +115,7 @@ class CNNModel(nn.Module):
         out = self.cnnBN2(out)
         out = self.maxpool2(out)
         
-        out = self.dropout(out)
+        #out = self.dropout(out)
         
         #CNN layer 3
         out = self.cnn3_1(out)
@@ -127,7 +127,7 @@ class CNNModel(nn.Module):
         out = self.cnnBN3(out)
         out = self.maxpool3(out)
         
-        out = self.dropout(out)
+        #out = self.dropout(out)
         
         #CNN layer 4
         out = self.cnn4_1(out)
@@ -139,7 +139,7 @@ class CNNModel(nn.Module):
         out = self.cnnBN4(out)
         out = self.maxpool4(out)
         
-        out = self.dropout(out)
+        #out = self.dropout(out)
         
         #CNN layer 5
         out = self.cnn5_1(out)
