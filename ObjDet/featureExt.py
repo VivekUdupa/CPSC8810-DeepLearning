@@ -443,6 +443,7 @@ keep = []
 
 while order.size > 0:
     i = order[0]
+    keep.append(i)
     xx1 = np.maximum(x1[i], x1[order[1:]])
     yy1 = np.maximum(y1[i], y1[order[1:]])
     xx2 = np.minimum(x2[i], x2[order[1:]])
@@ -459,6 +460,9 @@ while order.size > 0:
 
 keep = keep[:n_train_post_nms]
 roi = roi[keep]
+
+if __DEBUG__:
+    print("Final region proposal count: ", roi.shape)
 
 # Proposal Targets
 n_sample = 128
@@ -489,5 +493,22 @@ for num1, i in enumerate(roi):
             iou = 0.
 
         ious[num1, num2] = iou
-print(ious.shape)
-print(roi)
+
+if __DEBUG__:
+    print("Proposal Targets: ", ious.shape)
+
+# GT with max IoU for each region
+gt_assignment = ious.argmax(axis=1)
+max_iou = ious.max(axis=1)
+
+if __DEBUG__:
+    print("GT location with max IoU for each region and max IoU's")
+    print(gt_assignment)
+    print(max_iou)
+
+# Assign label to each proposal
+gt_roi_label = labels[gt_assignment]
+
+if __DEBUG__:
+    print("GT labels: ", gt_roi_label)
+
