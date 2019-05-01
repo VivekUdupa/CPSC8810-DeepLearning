@@ -310,9 +310,43 @@ where IoU is the intersection over union which is defined as: $IoU = \frac{\text
 \end{figure}
 \end{enumerate} 
 
+\textbf{Non Maximum Supression(NMS):} It is the process in which we remove/merge extremely highly overlapping bounding boxes. The general idea of non-maximum suppression is to reduce the number of detections in a frame to the actual number of objects present. If the object in the frame is fairly large and more than 2000 object proposals have been generated, it is quite likely that some of these will have significant overlap with each other and the object. The pseudo code to implement NMS is given below: 
+\begin{verbatim}
+- Take all the roi boxes [roi_array]
+- Find the areas of all the boxes [roi_area]
+- Take the indexes of order the probability score in descending order [order_array]
+keep = []
+while order_array.size > 0:
+  - take the first element in order_array and append that to keep  
+  - Find the area with all other boxes
+  - Find the index of all the boxes which have high overlap with this box
+  - Remove them from order array
+  - Iterate this till we get the order_size to zero (while loop)
+- Ouput the keep variable which tells what indexes to consider.
+\end{verbatim}
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{./Images/NMS.jpg}
+  \caption{An example of NMS }
+  \label{fig:NMS}
+\end{figure}
 
+\textbf{RoI Pooling: } Region of interest pooling (also known as RoI pooling) purpose is to perform max pooling on inputs of non-uniform sizes to obtain fixed-size feature maps. RoI Pooling is done in three steps:
+\begin{enumerate}
+	\item Dividing the region proposal into equal-sized sections (the number of which is the same as the dimension of the output)
+	
+	\item Finding the largest value in each section
+	
+	\item Copying these max values to the output buffer
 
+\end{enumerate}
 
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{./Images/ROIPool.png}
+  \caption{An example of RoI pooling}
+  \label{fig:ROIPool}
+\end{figure}
 
 
 Please refer the appendix for the python implementation of the above described model. 
