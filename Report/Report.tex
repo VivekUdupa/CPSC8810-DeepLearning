@@ -251,11 +251,11 @@ The model is trained with the given training dataset as per the below mentioned 
 \end{figure}
 
 
-The architecture for the object detection model, FRCNN is shown in Figure \ref{fig:FRCNN_model}. To detect objects in the given image, the Faster RCNN uses two models which are RPN for generating region proposals and another detection which uses generated proposals to identify objects[10]. The basic building blocks of FRCNN are explained in detail below: \\
+The architecture for the object detection model, FRCNN is shown in Figure \ref{fig:FRCNN_model}. To detect objects in the given image, the Faster RCNN uses two models which are RPN for generating region proposals and another detection model which uses generated proposals to identify objects[10]. The basic building blocks of FRCNN are explained in detail below: \\
 
 \textbf{Region Proposal Network(RPN): }
 \begin{enumerate}
-	\item In the first step, the input image goes through a CNN which will output a set of convolutional feature maps. \begin{figure}[H]
+	\item In step 1, the input image goes through a CNN which will output a set of convolutional feature maps. \begin{figure}[H]
 \centering
   \includegraphics[width=0.5\linewidth]{./Images/RPN1.jpeg}
   \caption{CNN layer with the feature map output}
