@@ -3,11 +3,13 @@
 \BOOKMARK [1][-]{section.2}{Methods}{}% 3
 \BOOKMARK [2][-]{subsection.2.1}{Implementation of CNN Model}{section.2}% 4
 \BOOKMARK [2][-]{subsection.2.2}{Training the CNN Model}{section.2}% 5
-\BOOKMARK [1][-]{section.3}{Results}{}% 6
-\BOOKMARK [1][-]{section.4}{Conclusion}{}% 7
-\BOOKMARK [1][-]{section.5}{Future Work}{}% 8
-\BOOKMARK [1][-]{section.6}{References}{}% 9
-\BOOKMARK [1][-]{section.7}{Appendix}{}% 10
-\BOOKMARK [2][-]{subsection.7.1}{Bully Detection CNN Model}{section.7}% 11
-\BOOKMARK [2][-]{subsection.7.2}{Training Code}{section.7}% 12
-\BOOKMARK [2][-]{subsection.7.3}{Test Code}{section.7}% 13
+\BOOKMARK [2][-]{subsection.2.3}{Implementation of FRCNN Model}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.4}{Training the FRCNN}{section.2}% 7
+\BOOKMARK [1][-]{section.3}{Expected Results}{}% 8
+\BOOKMARK [1][-]{section.4}{Conclusion}{}% 9
+\BOOKMARK [1][-]{section.5}{References}{}% 10
+\BOOKMARK [1][-]{section.6}{Appendix}{}% 11
+\BOOKMARK [2][-]{subsection.6.1}{Bully Detection CNN Model}{section.6}% 12
+\BOOKMARK [2][-]{subsection.6.2}{Training Code}{section.6}% 13
+\BOOKMARK [2][-]{subsection.6.3}{Test Code}{section.6}% 14
+\BOOKMARK [2][-]{subsection.6.4}{FRCNN}{section.6}% 15

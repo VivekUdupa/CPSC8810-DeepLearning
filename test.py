@@ -13,21 +13,23 @@ from detection_Model import CNNModel
 from PIL import Image
 
 # loading the input test image
-if(len(sys.argv)<2): #If test image path is not mentioned
+if(len(sys.argv)<2):
     sys.exit("Please specify an image to test")
 else:
     test_img_filename = sys.argv[1]
 
-img_size = (256, 256)
+img_size = (256,256)
 n_cnn = 3
-conv_size = int( img_size[0]/(2**n_cnn) )
+conv_size = int(img_size[0] /(2**(n_cnn + 1)) )
 test_img  = "./TestData/test/"
 test_img1  = "./TestData"
 Model = "./Model"
 
+device = torch.device("cuda:0")
+
 # Hyperparameter initialization
 batch_size      = 1
-  
+    
 # Define the transformation
 transform = transforms.Compose( [transforms.Resize(img_size),
                                  transforms.ToTensor(),
@@ -39,12 +41,14 @@ transform = transforms.Compose( [transforms.Resize(img_size),
 test_dataset = Image.open(test_img_filename)
 test_loader = transform(test_dataset)
 
+
 # Image parameters
 n_class         = 10
 
-model = CNNModel(conv_size, n_class).cuda()
+model = nn.DataParallel(CNNModel(conv_size, n_class))
+model = model.to(device)
 model.load_state_dict(torch.load('./Model/model.pth'))
-model.eval().cuda()
+model.eval().to(device)
 
 def ten_to_str(x):
 	""" Function to convert tensor label to a string """
@@ -55,7 +59,7 @@ def ten_to_str(x):
 with torch.no_grad():
     images = Variable(test_loader, requires_grad=True)
     images = images.unsqueeze(0)
-    images = images.cuda()
+    images = images.to(device)
     outputs = model(images)
     _, predicted = torch.max(outputs.data, 1)
     predicted = predicted.item()

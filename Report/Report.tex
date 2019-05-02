@@ -114,7 +114,7 @@ Deep Learning Model to Detect Cyberbully Actions in Images}
 \begin{abstract}
 \thispagestyle{plain}
 \addcontentsline{toc}{section}{\bf Abstract}
-This report explains the process involved in  a Convolutional Neural Network to detect and classify various cyberbully actions in an image. 
+This report explains the process involved in implementing a deep CNN and Faster-RCNN model in order to classify various cyberbully actions in an image and to detect the predator and victim in the same image. 
 \end{abstract}
 \newpage
 
@@ -124,26 +124,32 @@ This report explains the process involved in  a Convolutional Neural Network to 
 %----------------------------------------------------------------------------------------
 % Introduction Chapter
 \section{Introduction}
-This report considers the problem of detection and classification of cyberbully actions captured in an image using Deep learning models.  \\
+This report considers the problem of detection and classification of cyberbully actions and to identify the predator and victim in a bullying image using Deep learning models.  \\
 
 Cyberbullying is bullying that takes place over digital devices like cell phones, computers, and tablets. Cyberbullying can occur through SMS, Text, and apps, or online in social media, forums, or gaming where people can view, participate in, or share content. Cyberbullying includes sending, posting, or sharing negative, harmful, false, or mean content about someone else. Some cyberbullying crosses the line into unlawful or criminal behavior. With the prevalence of social media and digital forums, comments, photos, posts, and content shared by individuals can often be viewed by strangers as well as acquaintances. The content an individual shares online – both their personal content as well as any negative, mean, or hurtful content – creates a kind of permanent public record of their views, activities, and behavior. This public record can be thought of as an online reputation, which may be accessible to schools, employers, colleges, clubs, and others who may be researching an individual now or in the future. Cyberbullying can harm the online reputations of everyone involved – not just the person being bullied, but those doing the bullying or participating in it.[1] \\ 
 
 Deep learning is a subset of machine learning where artificial neural networks, algorithms inspired by the human brain, learn from large amounts of data. The term  ‘deep learning’ because the neural networks have various (deep) layers that enable learning. Deep learning allows machines to solve complex problems even when using a data set that is very diverse, unstructured and inter-connected. The more deep learning algorithms learn, the better they perform. [2] \\
 
-This report describes modeling of a deep learning network based on the concept of convolutional neural network for detecting and classifying cyberbully actions for a given image. The cyberbullying actions considered in this project are laughing, pulling-hair, quarrel, slapping, punching, stabbing, gossiping, strangle and isolation. The designed model is trained using the provided image dataset which contain above mentioned 9 categories of cyberbully actions in them.   
+This report describes modeling of a convolutional neural network for detecting and classifying cyberbully actions for a given image along with a RCNN model inorder to identify predator and victim present in that image. The cyberbullying actions considered in this project are laughing, pulling-hair, quarrel, slapping, punching, stabbing, gossiping, strangle and isolation. The CNN is trained using the provided image dataset which contain above mentioned 9 categories of cyberbully actions in them. The proposed RCNN is trained using provided images with ground truth bounding boxes for predator and victim classes.    
 
 \newpage
 
 \section{Methods}
-In deep learning, a convolutional neural network (CNN, or ConvNet) is a class of deep neural networks, most commonly applied to analyzing visual imagery.[3] A convolutional neural network consists of an input and an output layer, as well as multiple hidden layers. The hidden layers of a CNN typically consist of convolutional layers, ReLU layer i.e. activation function, pooling layers, fully connected layers and normalization layers.[4] \\ 
+In deep learning, a convolutional neural network (CNN, or ConvNet) is a class of deep neural networks, most commonly applied to analyzing visual imagery.[3] A convolutional neural network consists of an input and an output layer, as well as multiple hidden layers. The hidden layers of a CNN typically consist of convolutional layers, ReLU layer i.e. activation function, pooling layers, fully connected layers and normalization layers[4], which have been described in detain in section \ref{sec:model_def}. \\ 
 
-Convolutional networks were inspired by biological processes in that the connectivity pattern between neurons resembles the organization of the animal visual cortex. CNNs use relatively little pre-processing compared to other image classification algorithms. This means that the network learns the filters that in traditional algorithms were hand-engineered. This independence from prior knowledge and human effort in feature design is a major advantage. \\
+The implemented CNN model classifies the given input image into one of the nine categories of cyberbully actions. In order to further identify the predator and victim in the classified cyberbully image, an object detection model must be used. This can be achieved by using a Region based Convolutional Neural Network(RCNN). \\
 
-The implementation of our model based on CNN using an open source machine learning library PyTorch is described in the section below. 
+In R-CNN, the CNN is forced to focus on a single region at a time because it minimizes the interference and it is expected that only a single object of interest will dominate in a given region. These regions in the R-CNN are detected by selective search algorithm followed by resizing so that the regions are of equal size before they are fed to a CNN for classification and bounding box regression. The drawback of RCNN is that selective search algorithm is computation expensive. Thus in order to overcome this drawback a Faster RCNN(F-RCNN) model is proposed. \\
+
+F-RCNN approach is similar to the R-CNN algorithm but instead of feeding the region proposals to the CNN, the whole input image is fed to the CNN to generate a convolutional feature map. From the convolutional feature map, region of proposals are identified and warped into squares(Bounding Boxes) and by using a RoI(Region of Interest) pooling layer, region proposals are reshaped into fixed sizes so that it can be fed into a fully connected layer. Class of the proposed region and the offset of the bounding boxes are calculated by performing softmax on the RoI feature vector(Final layer of fully connected network)[6] \\ 
+
+The implementation of our models based on CNN and FRCNN algorithm using an open source machine learning library PyTorch is described in the below sections. 
+
+\newpage
 
 \subsection{Implementation of CNN Model}
 \label{sec:model_def}
-Our model is implemented using the following layers: 
+Our CNN model for classification consists of the following layers: 
 \begin{enumerate}
 	\item {\textbf{Convolutional Layer:}} The convolutional layer is the core building block of a CNN. The layer's parameters consist of a set of learnable filters (or kernels). During the forward pass, each filter is convolved across the width and height of the input volume, computing the dot product between the entries of the filter and the input and producing a 2-dimensional activation map of that filter. As a result, the network learns filters that activate when it detects some specific type of feature at some spatial position in the input.
 	
@@ -160,46 +166,50 @@ Our model is implemented using the following layers:
 
 \end{enumerate}
 
+\newpage
+
 The implementation details of our model is as follows: 
 \begin{enumerate}
-	\item \textbf{Image Pre-Processing: } The given input image is converted into mono-channeled, gray scale image of size 256 x 256. Then it is converted to a PyTorch tensor image and its values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
+	\item \textbf{Image Pre-Processing: } The given image is resized to (256 x 256)pixels. Then the images are randomly flipped or rotated for the purpose of data augmentation. Then it is converted to a PyTorch tensor image and its values are normalized with a mean of 0.5 and Standard Deviation of 0.5.   
   
-	\item \textbf{Convolution Layer 1:} The input to this layer is a preprocessed tensor image from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 16 channel feature map. 
+	\item \textbf{Convolution Layer 1\textunderscore 1:} The input to this layer is a preprocessed 3 channel tensor image from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 64 channel feature map. Xavier initialization is used to initialize the weights of this layer. 
 	
 	\item \textbf{ReLU Layer 1:} This layer applies a relu activation function to the 16 channel feature map.
+
+	\item \textbf{Convolution Layer 1\textunderscore 2 and ReLU:} The input to this layer is a 64 channel feature map from the previous layer. This layer performs 2D convolution using a 3x3 kernel with stride set to 1 and padding enabled to produce an output which is a 64 channel feature map. The output is normalized using ReLU.  
+
+	 \item \textbf{Batch Normalization: } This layer performs batch normalization inorder to avoid overfitting. 	
+	 	 
+	 \item \textbf{Max Pooling Layer 1:} This layer down-samples the 256 x 256 64 channel feature map to 128 x 128 64 channel feature map.
 	 
-	 \item \textbf{Max Pooling Layer 1:} This layer down-samples the 256 x 256 16 channel feature map to 128 x 128 16 channel feature map.
+	 \item \textbf{Convolution Layer 2\textunderscore 1 and ReLU:} The input to this layer is the 64 channel 128 x 128 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 128 channel feature map. ReLU activation is used to normalize the outputs.  
 	 
-	 \item \textbf{Convolution Layer 2:} The input to this layer is the 16 channel 128 x 128 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
+	 \item \textbf{Convolution Layer 2\textunderscore 2 and ReLU:} The input to this layer is the 128 channel 128 x 128 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. ReLU activation is used to normalize the outputs.  
 	 
-	 \item \textbf{ReLU Layer 2:} This layer applies a relu activation function to the 32 channel feature map.
+	 \item \textbf{Batch Normalization: } This layer performs batch normalization inorder to avoid overfitting.
+	 	 
+	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128 x 128 128 channel feature map to 64 x 64 128 channel feature map.
 	 
-	 \item \textbf{Max Pooling Layer 2:} This layer down-samples the 128 x 128 32 channel feature map to 64 x 64 32 channel feature map.
+	 \item \textbf{Convolution 3 with ReLU:} Similar to above convolution layers, Convolution 3 has 3 convolution layers, Convolution Layer 3\textunderscore 1, Convolution Layer 3\textunderscore 2 and Convolution Layer 3\textunderscore 3. The output of this layer is 64 x 64 512 channel feature map. 
+	 	 
+	 \item \textbf{Max Pooling Layer 3:} This layer down-samples the 64 x 64 512 channel feature map to 32 x 32 512 channel feature map.
 	 
-	 \item \textbf{Convolution Layer 3:} The input to this layer is the 32 channel 64 x 64 feature map from the previous layer. This layer performs 2D convolution using a 3 x 3 kernel with stride set to 1 and padding enabled to produce an output which is a 32 channel feature map. 
-	 
-	 \item \textbf{ReLU Layer 3:} This layer applies a relu activation function to the 32 channel feature map.
-	 
-	 \item \textbf{Max Pooling Layer 3:} This layer down-samples the 64 x 64 32 channel feature map to 32 x 32 32 channel feature map.
+	 \item \textbf{Convolution 4 and Convolution 5 with ReLU: } These two layers have similar configurations and structure as the Convolution 3 layer. The final output is a 8 x 8 512 channel feature map. 
 	 
 	 \item \textbf{Flattening Layer: } This layer flattens the 2D feature map to 1D feature map. 
 	 
 	 \item \textbf{Dropout Layer:} This layer randomly zeros some of the element of the input tensor with probability 0.4. 
 	 
-	 \item \textbf{Fully Connected Layer 1 and Relu layer 3:} This layer maps the 1D feature map into 5000 neurons. 
+	 \item \textbf{Fully Connected Layer 1 and Relu layer 3:} This layer maps the 1D feature map into 4096 neurons. 
 	 
-	 \item \textbf{Fully Connected Layer 2 and Relu layer 4:} This layer maps the 5000 neurons to 500 neurons.
+	 \item \textbf{Fully Connected Layer 2 and Relu layer 4:} This layer maps the 4096 neurons to 1000 neurons.
 	 
-	 \item \textbf{Fully Connected Layer 3 and Relu layer 5:} This layer maps 500 neurons into 250 neurons.
-	 	 
-	 \item \textbf{Fully Connected Layer 4 and Relu layer 6:} This layer maps 250 neurons into 100 neurons.
-	 	 
-	 \item \textbf{Fully Connected Layer 5 and softmax:} This layer maps 100 neurons into 10 categories of classification and softmax for normalization. 
+	 \item \textbf{Fully Connected Layer 3 and softmax:} This layer maps 1000 neurons into 10 categories of classification and softmax for normalization. 
 	 
 \end{enumerate}
 
 \subsection{Training the CNN Model}
-\label{model_train}
+\label{CNN_train}
 To train a deep learning model, the following parameters are considered:
 \begin{enumerate}
 	\item \textbf{Epoch:} An epoch describes the number of times the algorithm sees the entire data set. So, each time the algorithm has seen all samples in the dataset, an epoch has completed.
@@ -210,9 +220,9 @@ To train a deep learning model, the following parameters are considered:
 
 The implemented model is trained using the below mentioned configuration:
 \begin{enumerate}
-	\item Epoch = 25	
-	\item Batch Size = 1
-	\item Learning Rate = 0.0001
+	\item Epoch = 100	
+	\item Batch Size = 10
+	\item Learning Rate = 0.001
 \end{enumerate}
 
 The model is trained with the given training dataset as per the below mentioned algorithm:
@@ -231,64 +241,169 @@ The model is trained with the given training dataset as per the below mentioned 
 	
 \end{enumerate}
 
+\subsection{Implementation of FRCNN Model}
+\label{sec:FRCNN_impl}
+\begin{figure}[H]
+\centering
+  \includegraphics[width=\linewidth]{./Images/FRCNN_model.png}
+  \caption{Faster-RCNN block diagram. The magenta colored blocks are active only during training. The numbers indicate size of the tensors[7].}
+  \label{fig:FRCNN_model}
+\end{figure}
+
+
+The architecture for the object detection model, FRCNN is shown in Figure \ref{fig:FRCNN_model}. To detect objects in the given image, the Faster RCNN uses two models which are RPN for generating region proposals and another detection model which uses generated proposals to identify objects[10]. The basic building blocks of FRCNN are explained in detail below: \\
+
+\textbf{Region Proposal Network(RPN): }
+\begin{enumerate}
+	\item In step 1, the input image goes through a CNN which will output a set of convolutional feature maps. \begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{./Images/RPN1.jpeg}
+  \caption{CNN layer with the feature map output}
+  \label{fig:RPN1}
+\end{figure}
+	
+	\item In step 2, a sliding window is run spatially on these feature maps. The size of sliding window is n x n (generally 3x3). For each sliding window, a set of 9 anchors are generated which all have the same center ($x_a,y_a$) but with 3 different aspect ratios and 3 different scales as shown below. Note that all these coordinates are computed with respect to the original image.
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{./Images/RPN2.png}
+  \caption{Anchors}
+  \label{fig:RPN2}
+\end{figure}
+
+For each anchor, a value $p^*$ is computed which indicates how much the anchor overlaps with the groundtruth boxes. $p^*$ is 1 if IoU $>$ 0.7, -1 if IoU $<$ 0.3 and 0 otherwise.
+where IoU is the intersection over union which is defined as: $IoU = \frac{\text{Anchor $\cap$ GT Box}}{\text{Anchor $\cup$ GT Box}}$ 
+
+	\item In step 3, Finally, the 3×3 spatial features extracted from those convolution feature maps (shown above within red box) are fed to a smaller network which has two tasks: classification (cls) and regression (reg). The output of regressor determines a predicted bounding-box (x, y, w, h), The output of classification sub-network is a probability p indicating whether the predicted box contains an object (1) or it is from background (0 for no object).
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{./Images/RPN3.png}
+  \caption{Classification and Regression}
+  \label{fig:RPN3}
+\end{figure}
+\end{enumerate} 
+
+\textbf{Non Maximum Supression(NMS):} It is the process in which we remove/merge extremely highly overlapping bounding boxes. The general idea of non-maximum suppression is to reduce the number of detections in a frame to the actual number of objects present. If the object in the frame is fairly large and more than 2000 object proposals have been generated, it is quite likely that some of these will have significant overlap with each other and the object. The pseudo code to implement NMS is given below: 
+\begin{verbatim}
+- Take all the roi boxes [roi_array]
+- Find the areas of all the boxes [roi_area]
+- Take the indexes of order the probability score in descending order [order_array]
+keep = []
+while order_array.size > 0:
+  - take the first element in order_array and append that to keep  
+  - Find the area with all other boxes
+  - Find the index of all the boxes which have high overlap with this box
+  - Remove them from order array
+  - Iterate this till we get the order_size to zero (while loop)
+- Ouput the keep variable which tells what indexes to consider.
+\end{verbatim}
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{./Images/NMS.jpg}
+  \caption{An example of NMS }
+  \label{fig:NMS}
+\end{figure}
+
+\textbf{RoI Pooling: } Region of interest pooling (also known as RoI pooling) purpose is to perform max pooling on inputs of non-uniform sizes to obtain fixed-size feature maps. RoI Pooling is done in three steps:
+\begin{enumerate}
+	\item Dividing the region proposal into equal-sized sections (the number of which is the same as the dimension of the output)
+	
+	\item Finding the largest value in each section
+	
+	\item Copying these max values to the output buffer
+
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.4\linewidth]{./Images/ROIPool.png}
+  \caption{An example of RoI pooling}
+  \label{fig:ROIPool}
+\end{figure}
+
+\textbf{Detection Network: } Using the region proposals generated by the RPN network, Fast R-CNN detection network is used to classify and regresses the bounding boxes. Here, ROI pooling is performed first and then the pooled area goes through CNN and two FC branches for class softmax and bounding box regressor[11].
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.5\linewidth]{./Images/DetectionNW.png}
+  \caption{Fast R-CNN detection Network}
+  \label{fig:detection_model}
+\end{figure}
+
+\subsection{Training the FRCNN}
+The steps taken to develop FRCNN is as follows[8]:
+\begin{enumerate}
+	\item Pre-train a CNN network on image classification tasks as described in section \ref{CNN_train}
+	\item Fine-tune the RPN (Region Proposal Network) end-to-end for the region proposal task, which is initialized by the pre-train image classifier. Positive samples have IoU (Intersection-over-Union) $>$ 0.7, while negative samples have IoU $<$ 0.3. 
+	\begin{enumerate}
+		\item Slide a small n x n spatial window over the convolution feature map of the entire image.
+		\item At the center of each sliding window, we predict multiple regions of various scales and ratios simultaneously. An anchor is a combination of (sliding window center, scale, ratio). 
+	\end{enumerate}
+	\item Train a Fast R-CNN object detection model using the proposals generated by the current RPN
+	\item Then use the Fast R-CNN network to initialize RPN training. While keeping the shared convolutional layers, only fine-tune the RPN-specific layers. At this stage, RPN and the detection network have shared convolutional layers.
+	\item Finally fine-tune the unique layers of Fast R-CNN
+	\item Step 4-5 can be repeated to train RPN and Fast R-CNN alternatively if needed.
+\end{enumerate}
+
+Loss functions for the FRCNN is calculated as follows:
+\begin{align}
+	L_{box}(\{p_i\},\{t_i\}) &= \frac{1}{N_{cls}}\sum_{i}{}L_{cls}(p_i, p_i^*) + \frac{\lambda}{N_{box}}\sum_{i}{}p_i^* \cdot L_i^{smoott}(t_i - t_i^*) \\	
+	L_{cls}(p_i, p_i^*) &= -p_i^* logp_i - (1 - p_i^*)log(1 - p_i) \\
+	L &= L_{cls} + L_{box}
+\end{align} where 
+\begin{align*}
+	p_i &= \text{Predicted probability of anchor i being an object} \\
+	p_i* &= \text{Ground truth label (binary) of whether anchor i is an object} \\
+	t_i &= \text{Predicted four parameterized coordinates} \\
+	t_i* &= \text{Ground truth coordinates} \\
+	N_{cls} &= \text{Normalization term, set to be mini-batch size (~256) in the paper} \\
+	N_{box} &= \text{Normalization term, set to the number of anchor locations (~2400) in the paper} \\
+	\lambda &= \text{A balancing parameter, set to be ~10 in the paper } 
+\end{align*}
+
+
 
 Please refer the appendix for the python implementation of the above described model. 
 \newpage
 
-\section{Results}
-The network described in section \ref{sec:model_def} was trained using 2494 images split into 10 categories. For a batch size of 1, 25 epochs and a learning rate of 0.0001, the following results were observed. \\
+\section{Expected Results}
+Upon implementation and training of the model described in Section \ref{sec:FRCNN_impl} the following results are expected. 
 
-\noindent
-The training accuracy(single execution) was found to be 98.08\% . \\
-
-\noindent
-The network was tested using the following images. \\
-
-\noindent
-The image for the first test is pulled out from the training dataset. Figure \ref{fig:quarrel} is an image of two women involved in a heated argument and thus the image belongs to the \lq{quarrel}\rq{} category. The purpose of this test is to check if the network can recognize an image from the training dataset. 
 \begin{figure}[H]
-\centering
-  \includegraphics[width=.6\linewidth]{./Images/quarrel.jpg}
-  \caption{Test image from the \lq{quarrel}\rq{} category}
-  \label{fig:quarrel}
+  \centering
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{./Images/Result1.jpeg}
+    \caption{Test image from slapping category }
+    \label{fig:result1}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{./Images/Result1_Bbox.jpeg}
+    \caption{Result with bounding boxes for predator and victim}
+    \label{fig:result1bbox}
+  \end{minipage}
 \end{figure}
-The network classified Figure \ref{fig:quarrel} as \lq{quarrel}\rq{} category. \\
 
-\noindent
-The images used for the further tests are images that the network has never seen during the training phase. The purpose of these tests is to check if the network has learned any features based upon which it can categorize images into its respective categories. \\
+The test image shown in Figure \ref{fig:result1} will be classified as cyberbully action : slapping with predator identified with red bounding box and the victim identified with green bounding box as shown in Figure \ref{fig:result1bbox}.
 
-A Human being would classify Figure \ref{fig:gossip1} as two girls in the foreground gossiping about the third girl in the background. Thus this image falls under the \lq{gossiping}\rq{} category. 
 \begin{figure}[H]
-\centering
-  \includegraphics[width=.6\linewidth]{./Images/gossiping1.jpg}
-  \caption{Test image of two girls gossiping in the foreground}
-  \label{fig:gossip1}
+  \centering
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{./Images/Result2.jpeg}
+    \caption{Test image from slapping category }
+    \label{fig:result2}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[b]{0.4\textwidth}
+    \includegraphics[width=\textwidth]{./Images/Result2_Bbox.jpeg}
+    \caption{Result with bounding boxes for predator and victim}
+    \label{fig:result2bbox}
+  \end{minipage}
 \end{figure}
-The network classified Figure \ref{fig:gossip1} to be in the  \lq{strangle}\rq{} category. \\
 
-Upon inspection, Figure \ref{fig:gossip2} appears to comprise of two girls in the background gossiping about the girl in the foreground. Again this is an instance of \lq{gossiping}\rq{}
-\begin{figure}[H]
-\centering
-  \includegraphics[width=.6\linewidth]{./Images/gossiping2.jpg}
-  \caption{Test image of two girls gossiping in the background}
-  \label{fig:gossip2}
-\end{figure}
-The network classified Figure \ref{fig:gossip2} to be in the \lq{isolation}\rq{} category. \\
-\\
+The test image shown in Figure \ref{fig:result2} will be classified as cyberbully action : punching with predator identified with red bounding box and the victim identified with green bounding box as shown in Figure \ref{fig:result2bbox}.
 
-Figure \ref{fig:isolation} is quiet straightforward. This is a picture of a girl being excluded from a group of friends. Thus this image falls under the \lq{isolation}\rq{} category. \\
-\begin{figure}[H]
-\centering
-  \includegraphics[width=.6\linewidth]{./Images/isolation1.jpg}
-  \caption{Test image of isolation}
-  \label{fig:isolation}
-\end{figure}
-The network classified Figure \ref{fig:isolation} as \lq{punching}\rq{} category. \\
-
-\newpage
 
 \section{Conclusion}
-The goal of this project is to develop a deep neural network that takes an image as input and categorizes it into one of the 10 below mentioned categories of bullying. \\
+The goal of this project was to develop a deep neural network that takes an image as input and categorizes it into one of the 10 below mentioned categories of bullying. Further it was desired that the identification network would identify the predator and victim in the images classified as cyberbullyig. \\
 \begin {enumerate*} [1) ]%
 	\item Gossiping
 	\item Isolation
@@ -301,33 +416,12 @@ The goal of this project is to develop a deep neural network that takes an image
 	\item Stabbing
 	\item Non bullying
 \end {enumerate*} \\
-The neural network was developed using PyTorch. The training dataset for the network was made up of 2494 images belonging to the 10 above mentioned categories. The training accuracy for a single run was observed to be 98\%. Four testing examples are mentioned in this report. \\
+The neural network was developed using PyTorch. The training dataset for the classification network was made up of 2494 images belonging to the 10 above mentioned categories. \\
 
-When the network was presented with an image from the training dataset, it had no problem in predicting the category of the image. The image for this test was taken from the \lq{quarrel}\rq{} category(Figure \ref{fig:quarrel}) and the network predicted it correctly. This confirms that the network actually recognizes the training images and it is not just randomly predicting the image category. \\
+In order to avoid overfitting in the CNN model for classification network, batch normalization and image augmentation strategies were implemented. \\
 
-For the next three tests, the network was given images that it had never seen before. Here the network is expected to recognize a set of features(in the test image) that it has learnt through the training phase to predict the category of bullying. \\
+Unfortunately, due to time constraints, we were unable to complete the implementation of the researched FRCNN model. Please refer to the appendix for the partial implementation code of FRCNN model. We believe that the above researched model would provide satisfactory result for the given project problem statement as shown in [9]. 
 
-When the network was tested with Figure \ref{fig:gossip1}, which is an instance of \lq{gossiping}\rq{} the network wrongly classified it as \lq{strangle}\rq{}. Since the subject in Figure \ref{fig:gossip1} seem to be very close to each other, the network confuses it with \lq{strangling}\rq{}. The reason for this wrong prediction could be that the network has not learnt enough features to clearly distinguish between strangling and gossiping. A deeper network with more complex structure could help the network extract more features. \\
-
-Figure \ref{fig:gossip2} is a complicated image compared to the other test images. This image could either be gossiping or isolation. The girl in the foreground appears to be isolated from the group in the background who are gossiping. The network classified this image to be of the \lq{isolation}\rq{} category. This is probably because the network weighs the foreground subject more than the background. Having a bounding box label would probably help the network prioritize the subject more accurately. \\
-
-Figure \ref{fig:isolation} clearly falls under the \lq{isolation}\rq{} category. But the network classified it as punching. Over-fitting could be the cause for this result. Adding a better dropout layer might refrain the network from over-fitting. \\
-
-In conclusion the model defined in section \ref{sec:model_def} is shallow. Such a basic CNN struggles to deal with images that does not directly fall under a single category of bullying. Having an object detection model such as the YOLO or the RCNN would help in better image classification. Having a pre-trained model like the Resnet or the VGG-16 would improve the test accuracy significantly. The type of image labeling used also plays a significant role. Having boundary box labeling might aid the network in more accurate subject prioritization.   
-
-
-\section{Future Work}
-Based on the Results, the following changes are planned to improve the network accuracy. 
-\begin{enumerate}
-	\item Implement YOLO and RCNN for object detection
-	\item Implement a deeper network structure for more feature extraction
-	\item Label the images using Boundary box labeling
-	\item Increase the training image dataset
-\end{enumerate}
-
-
- 
- 
 \newpage
 \section{References}
 \begin{enumerate}[label={[\arabic*]}]
@@ -336,6 +430,12 @@ Based on the Results, the following changes are planned to improve the network a
 \item \url{https://en.wikipedia.org/wiki/Convolutional_neural_network#Convolutional}
 \item \url{https://cs231n.github.io/convolutional-networks/}
 \item \url{https://machinelearningmastery.com/dropout-for-regularizing-deep-neural-networks/}
+\item \url{https://towardsdatascience.com/r-cnn-fast-r-cnn-faster-r-cnn-yolo-object-detection-algorithms-36d53571365e}
+\item \url{https://medium.com/@whatdhack/a-deeper-look-at-how-faster-rcnn-works-84081284e1cd}
+\item \url{https://lilianweng.github.io/lil-log/2017/12/31/object-recognition-for-dummies-part-3.html#fast-r-cnn}
+\item \url{https://arxiv.org/abs/1506.01497}
+\item \url{https://www.quora.com/How-does-the-region-proposal-network-RPN-in-Faster-R-CNN-work}
+\item \url{https://towardsdatascience.com/review-faster-r-cnn-object-detection-f5685cb30202}
 \end{enumerate}
 \newpage
 
@@ -346,6 +446,7 @@ Based on the Results, the following changes are planned to improve the network a
 \lstinputlisting[language=Python]{../training.py}
 \subsection{Test Code}
 \lstinputlisting[language=Python]{../test.py}
-
+\subsection{FRCNN}
+\lstinputlisting[language=Python]{../ObjDet/featureExt.py}
 
 \end{document} 
