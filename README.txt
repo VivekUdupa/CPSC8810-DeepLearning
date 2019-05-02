@@ -35,11 +35,12 @@ File name			Description
 ----------------------------------------------------
 detection_Model.py		Python code of the CNN model described above.
 imageView.py			Python code to display a jpeg/jpg image
-training.py			Python code to train the CNN model defined in the detection_Model.py code.
-test.py				Python code to test the trained model
-README.txt			This file
-REPORT/				This folder consists of the Midterm Report.
-PyTorch_Exercise/		This folder consists of practice codes used while getting used to working with PyTorch 
+training.py			    Python code to train the CNN model defined in the detection_Model.py code.
+test.py				    Python code to test the trained model
+README.txt			    This file
+REPORT/				    This folder consists of the Midterm Report.
+PyTorch_Exercise/	    This folder consists of practice codes used while getting used to working with PyTorch 
+ObjDet/featureExt.py    Python code of the researched FRCNN model. 
 
 
 ====================================================
